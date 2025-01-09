@@ -410,9 +410,12 @@ idx_beta2 = find(contains(A,'beta_2'));
 if isempty(idx_beta2)
     if isempty(idx_beta1)
         idx_beta1 = find(contains(A,'beta')); % Only one coefficient specified
+        for k=1:length(idx_beta1) % Add beta_1 field
+            A{idx_beta1(k)}='beta_1      = ';
+        end
     end
     for k=1:length(idx_beta1) % Add beta_2 field
-        A=[A(1:idx_beta1(k)),{'beta_2      = '},A(idx_beta1(k)+1:end)];
+        A=[A(1:idx_beta1(k)+k-1),{'beta_2      = '},A(idx_beta1(k)+k:end)];
     end
     idx_beta2 = find(contains(A,'beta_2'));
 end
@@ -427,7 +430,7 @@ idx_T0 = find(contains(A,'T_0'));
 
 idx_beta1 = idx_beta1( idx_beta1 > idx_T(1) & idx_beta1 < idx_T(2)); % Beta1 coefficient of the specific T probe
 idx_beta2 = idx_beta2( idx_beta2 > idx_T(1) & idx_beta2 < idx_T(2)); % Beta2 coefficient of the specific T probe
-idx_T0 = idx_T0( idx_T0 > idx_T(1) & idx_T0 < idx_T(2));
+idx_T0 = idx_T0( idx_T0 > idx_T(1) & idx_T0 < idx_T(2)); % T0 coefficient of the specific T probe
 
 if add_space
     A(idx_beta1) =  {['beta_1      = ', num2str(beta(1),'%15.6f')]};
@@ -436,7 +439,7 @@ if add_space
         A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
     else
         A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
-        A(idx_beta2)=[]; 
+        A(idx_beta2)=[]; % No beta_2
     end
 else
     A(idx_beta1) =  {['beta_1=', num2str(beta(1),'%15.6f')]};
@@ -445,7 +448,7 @@ else
         A(idx_T0) =  {['T_0=', num2str(T_0,'%15.6f')]};
     else
         A(idx_T0) =  {['T_0=', num2str(T_0,'%15.6f')]};
-        A(idx_beta2)=[]; 
+        A(idx_beta2)=[]; % No beta_2
     end
 
 end

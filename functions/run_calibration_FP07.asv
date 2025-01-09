@@ -1,12 +1,7 @@
-function [data_prof,cfgfile_cal] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,modified_data_file,cfgfile_mod,make_plot)
+function [data_prof,cfgfile_cal] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,kf,modified_data_file,cfgfile_mod,make_plot)
 %RUN_CALIBRATION_FP07 Calibrate FP07
 %   Detailed explanation goes here
 % make_plot: optional (=False by default)
-
-%%
-if nargin<8
-    make_plot=false;
-end
 %% Calibration
 fprintf(">>> FP07 calibration\n")
 m=[]; % position of values along a profile
@@ -30,17 +25,17 @@ cfgfile_cal=[cfgfile_mod '_calibrated'];
 copyfile([cfgfile_mod '.cfg'],[cfgfile_cal '.cfg']);
 if param.config.T1
     % Save precalibration data:
-    T1_precal=data_prof.T1_fast;
+    T1_precal=data_prof.T1;
     [T_01,beta1,lag1] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T1',cfgfile_cal,temp_info);
 end
 
 if param.config.T2
-    T2_precal=data_prof.T2_fast;
+    T2_precal=data_prof.T2;
     [T_02,beta2,lag2] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T2',cfgfile_cal,temp_info);
 end
 
 
-%% Re-pacth the P-file
+%% Re-pacth the P-file 
 % if exist(modified_data_file,'file')
 %     delete(modified_data_file)
 % end
@@ -61,42 +56,7 @@ end
 %% Make plot
 if make_plot
     figure
-    leg={};
-
-    subplot(1,2,1) % Before calibration
-    if param.config.T1
-        plot(T1_precal,data_prof.P_fast,'LineWidth',1)
-        hold on
-        leg{end+1}='T1';
-    end
-    if param.config.T2
-        plot(T2_precal,data_prof.P_fast,'LineWidth',1)
-        hold on
-        leg{end+1}='T2';
-    end
-    plot(data_prof.(param.CTD_T),data_prof.P_slow,'k','LineWidth',1)
-    leg{end+1}='CTD-T';
-    legend(leg);
-    set(gca,'ydir','reverse')
-    xlabel('Temperature [°C]')
-    ylabel('Pressure [dbar]')
-    title(gca,'Before calibration')
-
-    subplot(1,2,2) % Before calibration
-    if param.config.T1
-        plot(data_prof.T1_fast,data_prof.P_fast,'LineWidth',1)
-        hold on
-    end
-    if param.config.T2
-        plot(data_prof.T2_fast,data_prof.P_fast,'LineWidth',1)
-        hold on
-    end
-    plot(data_prof.(param.CTD_T),data_prof.P_slow,'k','LineWidth',1)
-    set(gca,'ydir','reverse')
-    xlabel('Temperature [°C]')
-    title(gca,'After calibration')
-
-
+    subplot(1,2,1)
 end
 
 end
