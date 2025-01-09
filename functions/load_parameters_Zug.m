@@ -1,5 +1,5 @@
 
-function [param] = load_parameters(lakename,date,general_data_folder,direction,instrument)
+function [param] = load_parameters_Zug(lakename,date,general_data_folder,direction,instrument)
 %LOAD_PARAMETERS Give parameters specific to a field campaign.
 %
 %   INPUTS:
@@ -34,9 +34,7 @@ param.info.despike_sh  = [ 8  0.5 0.04]; % Parameters to remove spikes in shear 
 param.info.despike_A = [8 0.5000 0.0400]; % Parameters to remove spikes in accelerometer data (see odas function "despike")
 
 %% Campaign-specific values (can overwrite default values)
-if strcmp(lakename,"Geneva")
-    param=load_campaign_Geneva(param,date,general_data_folder);
-elseif strcmp(lakename,"Zug")
+if strcmp(lakename,"Zug")
     param=load_campaign_Zug(param,date,general_data_folder);
 elseif strcmp(lakename,"default")
     if nargin<4 % Direction was not specified
@@ -201,7 +199,7 @@ param.info.dpD = 1; % Bin size [m]
 %% Campaign-specific values
 %**************************************************************************
 if strcmp(date,'20211110') % Oscar's campaign #1
-    param.folder = [general_data_folder,'Lake_Zug\2021_2022_Microstructure_campaigns_OSS\0Zug_FW2021\20211110\VMP\Level0\'];
+    param.folder = [general_data_folder,'20211110\Level0\'];
     param.filename_list={'VMP001','VMP002','VMP003','VMP005'}; % Several files can be listed here
     
     % Set P offset and sh probe sensitivity
