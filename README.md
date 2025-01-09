@@ -3,6 +3,7 @@
 ## Introduction
 
 This repository contains the data and scripts related to turbulence measurements in Lake Zug that are part of the Interbasin Exchanges in Stratified Lakes (IBEX) project.
+
 Link to the remote repository: https://gitlab.renkulab.io/tomy.doda/turbulence-lakezug.git
 
 ## Working with the project
