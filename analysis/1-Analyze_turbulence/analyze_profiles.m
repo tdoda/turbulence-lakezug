@@ -6,23 +6,22 @@ clc
 
 %% Parameters to adapt
 % Campain
-lakename='default'; % Options: 'Geneva', 'Zug', 'default'
+lakename='Zug'; % Options: 'Zug' or 'default' (see load_parameters_Zug function)
 instrument='VMP'; % Options: 'VMP' or 'microCTD'
 direction = 'down'; % Direction of the profile, options: 'up' and 'down'
-general_data_folder='C:\Users\tdoda\OneDrive - Université de Lausanne\Fieldwork\'; % Where fieldwork data is stored
-odas_folder='..\Profiler VMP\2018_05_15_USB_Stick\odas_v4.3.03\odas';
-%odas_folder='..\Profiler MicroCTD\Scripts\Sebastiano_private_scripts\odas_v4.4\odas';
-date_campaign="20241204"; % Should match the date in "load_parameters" function except if "default" is used
+general_data_folder='..\..\data\'; % Where fieldwork data is stored
+odas_folder='..\..\functions\odas_v4.4\';
+date_campaign="20211110"; % Should match the date in "load_parameters" function except if "default" is used
 run_quick_look=false; % Apply quick_look function from Rockland (shear dissipation only)
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
 calibrate_FP07=true; % Calibrate FP07
 run_dissip=false; % Compute dissipation based on Sebastiano's script
-cfg_file='setup_EAWAG_Zug_2024_12_04'; % If in the data folder (could also be specified in parameters)
+cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
 make_plot_prof = false; % Make profile-related plots.
 make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
 
 addpath(odas_folder)
-addpath("Functions_microstruct\")
+addpath("..\..\functions\") % Add microstructure functions
 %% Load metadata
 param=load_parameters(lakename,date_campaign,general_data_folder,direction,instrument);
 
