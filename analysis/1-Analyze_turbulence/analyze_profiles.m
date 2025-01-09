@@ -17,8 +17,8 @@ modify_cfg=true; % Modify the configuration file (if "false", configuration from
 calibrate_FP07=true; % Calibrate FP07
 run_dissip=false; % Compute dissipation based on Sebastiano's script
 cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
-make_plot_prof = false; % Make profile-related plots.
-make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
+make_plot_prof = true; % Make profile-related plots.
+make_plot_spectra = true; % Make spectra plots (temperature and shear spectra).
 
 addpath(odas_folder)
 addpath("..\..\functions\") % Add microstructure functions
@@ -122,7 +122,7 @@ for kf=1:length(param.filename_list)
     %% Calibration of the fast thermistors
 
     if calibrate_FP07
-        [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,kf,modified_data_file,cfgfile_mod);
+        [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,modified_data_file,cfgfile_mod,make_plot_prof);
     end
 
     DATA(kf)=data_prof;
@@ -161,7 +161,7 @@ for kf=1:length(param.filename_list)
 
         % Correct pressure with respect to the atmospheric pressure for the
         % given profile
-        [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof);
+        [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot_prof);
 
 
         % Turbulence analysis
