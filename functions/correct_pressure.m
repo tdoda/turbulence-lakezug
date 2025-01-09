@@ -86,10 +86,10 @@ else % Downward profile
 end
 
 %% Re-load the profile with pmin=0 (this part was originally in resolve_profile_all)
-data_prof.ind_prof_slow = get_profile(P_slow_corr,data_prof.W_slow,0,...
+data_prof.ind_prof_slow = get_profile(P_slow_corr',data_prof.W_slow,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_slow);
-data_prof.ind_prof_fast  = get_profile(P_fast_corr,data_prof.W_fast,0,...
-        param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
+data_prof.ind_prof_fast  = get_profile(P_fast_corr',data_prof.W_fast,0,...
+    param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
 [~,data_prof.Nprf] = size(ind_prof_slow); % Number of profiles
 
 %% Save the corrected pressure only for the specific profile
@@ -103,23 +103,57 @@ mrho = cumsum(data_prof.rhoTS)./(1:length(data_prof.rhoTS))'; % [kg/m3]
 data_prof.depth=10000*data_prof.P_slow./(mrho*g); % [m]
 
 %% Plot
-if make_plot && length(ind_prof_fast_plot)>1
+if make_plot
+
+    if length(ind_prof_fast_plot)>1
+
+        % Plot from S. Piccolroaz
+        figure
+        set(gcf, 'Units', 'centimeters', 'Position', [1 1 20 8]);
+        subplot(1,Nprf,counter)
+        plot(ind_prof_fast_plot,data_prof.P_fast(ind_prof_fast_plot),'.-k'); hold on
+        if isfield(data_prof,'C1_fast')
+            plot(ind_prof_fast_plot,normalize(data_prof.C1_fast(ind_prof_fast_plot))/2,'-g');
+        end
+        plot(ind_prof_fast_plot,normalize(data_prof.T1_fast(ind_prof_fast_plot))/2,'.-r');
+        plot(ind_prof_fast_plot,data_prof.W_fast(ind_prof_fast_plot),'.-k');
+        plot(ind_prof_fast_plot,data_prof.sh1(ind_prof_fast_plot)/50,'.-m'); hold on
+        plot(ind_prof_slow_plot,normalize(data_prof.(CTD_C)(ind_prof_slow_x))/2,'.-b'); hold on
+        plot([ind_prof_fast_plot(1) ind_prof_fast_plot(end)],[0 0],'--k');
+        if ~isempty(istop)
+            plot([ind_prof_fast_plot(istop) ind_prof_fast_plot(istop)],[-1 1],'--g');
+        end
+        ylim([-1 1])
+    end
+
+    % Plot to compare before-after pressure correction
+    indslow=data_prof.ind_prof_slow(1,kprof):data_prof.ind_prof_slow(2,kprof);
+    indfast=data_prof.ind_prof_fast(1,kprof):data_prof.ind_prof_fast(2,kprof);
+
     figure
-    set(gcf, 'Units', 'centimeters', 'Position', [1 1 20 8]);
-    subplot(1,Nprf,counter)
-    plot(ind_prof_fast_plot,data_prof.P_fast(ind_prof_fast_plot),'.-k'); hold on
-    if isfield(data_prof,'C1_fast')
-        plot(ind_prof_fast_plot,normalize(data_prof.C1_fast(ind_prof_fast_plot))/2,'-g');
-    end
-    plot(ind_prof_fast_plot,normalize(data_prof.T1_fast(ind_prof_fast_plot))/2,'.-r');
-    plot(ind_prof_fast_plot,data_prof.W_fast(ind_prof_fast_plot),'.-k');
-    plot(ind_prof_fast_plot,data_prof.sh1(ind_prof_fast_plot)/50,'.-m'); hold on
-    plot(ind_prof_slow_plot,normalize(data_prof.(CTD_C)(ind_prof_slow_x))/2,'.-b'); hold on
-    plot([ind_prof_fast_plot(1) ind_prof_fast_plot(end)],[0 0],'--k');
-    if ~isempty(istop)
-        plot([ind_prof_fast_plot(istop) ind_prof_fast_plot(istop)],[-1 1],'--g');
-    end
-    ylim([-1 1])
+
+    ax1=subplot(1,2,1);
+    plot(data_prof.(param.CTD_T)(indslow),data_prof.P_slow_raw(indslow))
+    hold on
+    plot(data_prof.(param.CTD_T)(indslow),data_prof.P_slow(indslow))
+    plot(data_prof.(param.CTD_T)(indslow),data_prof.depth(indslow),'k')
+    xlabel('Temperature [°C]')
+    ylabel('Pressure [dbar]/Depth [m]')
+    legend('Praw','Pcorr','Depth')
+    set(gca,'ydir','reverse')
+    title(gca,'Slow data')
+
+    ax2=subplot(1,2,2);
+    plot(data_prof.T1_fast(indfast),data_prof.P_fast_raw(indfast))
+    hold on
+    plot(data_prof.T1_fast(indfast),data_prof.P_fast(indfast))
+    xlabel('Temperature [°C]')
+    legend('Praw','Pcorr')
+    set(gca,'ydir','reverse')
+    title(gca,'Fast data')
+
+    linkaxes([ax1,ax2],'y')
+
 end
 
 
