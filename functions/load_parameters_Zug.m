@@ -176,43 +176,6 @@ end
 
 end
 
-function [param] = load_campaign_Geneva(param,date,general_data_folder)
-%LOAD_CAMPAIGN_GENEVA Give parameters specific to field campaigns in Lake Geneva (microCTD).
-%
-%   INPUTS:
-%   param (structure): default parameters 
-%   date (str): date of the campaign with the format "yyyymmdd"
-%   general_data_folder (str): path to the data folder
-%
-%   OUTPUTS:
-%   param (structure): parameters specific to the campaign
-%
-% T. Doda, 29.11.2024
-%% Values for all campaigns
-
-% param.info.mindur_detect = 5; % Minimim duration of a profile [s]
-param.info.system = 'Lem';
-%% Campaign-specific values
-%**************************************************************************
-if strcmp(date,'20241115')
-    param.instrument='microCTD';
-    param.info.prof_dir = 'down';
-    param.filename_list={'DAT_033'}; % Several files can be listed here
-    % param.cfgfile = '';
-    param.folder = [general_data_folder,'Lake_Geneva\09-20241115_24h\microCTD\Profiles\'];
-    param.config.T1=true;
-    param.config.T2=true;
-    param.config.S1=true;
-    param.config.S2=true;
-    param.config.uC1=false;
-    param.config.uC2=false;
-%**************************************************************************
-else
-    error("Invalid campaign date")
-end
-
-end
-
 function [param] = load_campaign_Zug(param,date,general_data_folder)
 %LOAD_CAMPAIGN_ZUG Give parameters specific to field campaigns in Lake Zug (VMP).
 %
