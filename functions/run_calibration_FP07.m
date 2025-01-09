@@ -1,4 +1,4 @@
-function [data_prof,filename,cfgfile_mod] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,kf,cfgfile_mod)
+function [data_prof,cfgfile_cal] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,kf,modified_data_file,cfgfile_mod)
 %RUN_CALIBRATION_FP07 Calibrate FP07
 %   Detailed explanation goes here
 
@@ -17,32 +17,31 @@ else
 end
 
 % Run calibration and change parameters in the config file
+cfgfile_cal=[cfgfile_mod '_calibrated'];
+copyfile([cfgfile_mod '.cfg'],[cfgfile_cal '.cfg']);
 if param.config.T1
-    [T_01,beta1,lag1] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T1',cfgfile_mod,temp_info);
+    [T_01,beta1,lag1] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T1',cfgfile_cal,temp_info);
 end
 
 if param.config.T2
-    [T_02,beta2,lag2] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T2',cfgfile_mod,temp_info);
+    [T_02,beta2,lag2] = cal_FP07_in_situ_EPFL(data_prof,m,CTD_T,'T2',cfgfile_cal,temp_info);
 end
 
 
 %% Re-pacth the P-file 
-filename0 = param.filename_list{kf};
-filename = [filename0,'_patched'];
-original_data_file=[param.folder,filename0,'.P'];
-modified_data_file=[param.folder,filename,'.P'];
-if exist(modified_data_file,'file')
-    delete(modified_data_file)
+% if exist(modified_data_file,'file')
+%     delete(modified_data_file)
+% end
+if ~exist(modified_data_file,'file')
+    error('No patched data file available')
 end
-copyfile(original_data_file,modified_data_file); % Create a copy of the P file where the configuration file will be modified
-
-patch_setupstr([param.folder,filename],cfgfile_mod); % patch the new cfg file
-%delete([cfgfile_tmp,'.cfg']) % remove the new cfg file
+%copyfile(original_data_file,modified_data_file); % Create a copy of the P file where the configuration file will be modified
+patch_setupstr(modified_data_file,cfgfile_cal); % patch the new cfg file
 
 %% Re-convert the data to physical units
 clear data_prof
 default_parameters=odas_p2mat;
-data_prof = odas_p2mat([param.folder,filename,'.P'],default_parameters);          % re-convert data to physical units
+data_prof = odas_p2mat(modified_data_file,default_parameters);          % re-convert data to physical units
 if ~strcmp(data_prof.input_parameters.gradT_method,'high_pass')
     error('Error: the gradT_method should be high_pass (if first_difference, pass the info to get_scalar_spectra_odas)')
 end

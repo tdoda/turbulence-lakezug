@@ -205,8 +205,9 @@ if strcmp(date,'20211110') % Oscar's campaign #1
     % Set P offset and sh probe sensitivity
     % param.offset_P=-0.33;
     % Use shear sensitivities specified in config file: 
-    param.cfgfile = 'setup_EAWAG_2018_07_18_OS';
-    
+    % param.cfgfile = 'setup_EAWAG_2018_07_18_OS';
+    param.cfgfile = 'setup_test';
+
     param.config.T1=true;
     param.config.T2=true;
     param.config.S1=true;

@@ -190,7 +190,7 @@
 % * 2019-06-03 (JMM) Updated comments and documentation. 
 
 
-function [T_0,beta,Lag] = cal_FP07_in_situ(DATA,m,T_ref_string,T_string,cfgfile,varargin)
+function [T_0,beta,Lag] = cal_FP07_in_situ_EPFL(DATA,m,T_ref_string,T_string,cfgfile,varargin)
 
 %-----------------------------------------------------------------
 % ----- Default parameters ---------------------------------------
@@ -224,7 +224,10 @@ val_numeric     = @(x) isnumeric(x) && isscalar(x);
 val_string      = @(x) ischar(x);
 val_logical     = @(x) islogical(x);
 
-addParamValue(p, 'order',                default_order,                val_numeric);
+% Add parameters with their default values that will only be used if no
+% value is specified when calling the function (values of the parameters
+% are provided in varargin otherwise)
+addParamValue(p, 'order',                default_order,                val_numeric); 
 addParamValue(p, 'vehicle_info',         default_vehicle_info);
 
 addParamValue(p, 'make_figures', default_make_figures, val_logical);
@@ -249,6 +252,8 @@ plot_result          = p.Results.plot_result;
 % end of input argument checking.
 
 fig_num = 0;
+
+fprintf('Temperature regression: order %0d\n',order)
 
 % -----------------------------------------------------------------------
 % --- Load the data -----------------------------------------------------
@@ -297,7 +302,7 @@ end
 %----------------------------------
 % - Warning if range is too small - 
 %----------------------------------
-if max(T_ref(m))-min(T_ref(m))<=8 & order>1
+if max(T_ref(m))-min(T_ref(m))<=8 && order>1
     warning(['Temperature range is less than 8 degrees '...
         '-> Recommend using FIRST-ORDER calibration.',...
         ' Exit function (typically by CRTL+C) and re-run with additional inputs,'...

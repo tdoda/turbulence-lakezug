@@ -23,7 +23,7 @@ make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
 addpath(odas_folder)
 addpath("..\..\functions\") % Add microstructure functions
 %% Load metadata
-param=load_parameters(lakename,date_campaign,general_data_folder,direction,instrument);
+param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
 
 if ~isfield(param,'cfgfile') || strcmp(param.cfgfile,'')
     if exist('cfg_file','var')
@@ -47,9 +47,9 @@ for kf=1:length(param.filename_list)
     else
         tmp = [param.info.time_corr num2str(param.info.time_res,'%6.4f') ];
     end
-    folder_out = [param.folder param.filename_list{kf} '_' param.info.prof_dir num2str(param.info.dpD,'%3.1f') '_'  param.info.Tspec num2str(param.info.q,'%3.1f') ...
+    folder_out = [param.folder '..\Level1\' param.filename_list{kf} '_' param.info.prof_dir num2str(param.info.dpD,'%3.1f') '_'  param.info.Tspec num2str(param.info.q,'%3.1f') ...
         '_' param.info.int_range '_' tmp '_' param.info.npoles 'pole_nfft' num2str(param.info.num_fft)   ...
-        '_' param.info.Nasmyth_spec '_' param.info.noise_corr];
+        '_' param.info.Nasmyth_spec '_' param.info.noise_corr '\'];
     if exist(folder_out, 'dir')
         gohead=input('>>> Warning: the folder already exists, do you want to remove it and proceed (y/n): ','s');
         if strcmpi(gohead,'y')
@@ -74,7 +74,7 @@ for kf=1:length(param.filename_list)
    
     %% Modify and patch the config file
 
-    [data_prof,filename,cfgfile_mod] = get_config(param,data_prof,folder_out,modify_cfg,kf);
+    [data_prof,modified_data_file,cfgfile_mod] = get_config(param,data_prof,folder_out,modify_cfg,kf);
     
 
     %% Extract the profiles
@@ -102,7 +102,7 @@ for kf=1:length(param.filename_list)
             diss_prof(kprof)=quick_look([param.folder,param.filename_list{kf},'.P'],pmin_ql,pmax_ql,ql_info);
             
             figHandles = findobj('Type', 'figure');
-            folder_prof=[folder_out,'\','Prof_',num2str(kprof)];
+            folder_prof=[folder_out,'Prof_',num2str(kprof)];
             if exist(folder_prof, 'dir')
                 rmdir(folder_prof,'s')
             end
@@ -122,7 +122,7 @@ for kf=1:length(param.filename_list)
     %% Calibration of the fast thermistors
 
     if calibrate_FP07
-        [data_prof,filename_patched,cfgfile_mod]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,kf,cfgfile_mod);
+        [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,kf,modified_data_file,cfgfile_mod);
     end
 
     DATA(kf)=data_prof;
