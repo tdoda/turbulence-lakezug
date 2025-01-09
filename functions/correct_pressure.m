@@ -1,0 +1,126 @@
+function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot)
+%CORRECT_PRESSURE Compute pressure with respect to the atmospheric
+%pressure.
+%
+%   INPUTS:
+%   data_prof (structure): profiling data in a given data file.
+%   param (structure): parameters specific to the campaign
+%   ind_prof_slow (2*Nprf int array): starting and ending indices of the
+%   Nprf different profiles in the data file, computed from the low
+%   frequency pressure data.
+%   ind_prof_fast (2*Nprf int array): starting and ending indices of the
+%   Nprf different profiles in the data file, computed from the high
+%   frequency pressure data.
+%   kprof (int): profile index between 1 and Nprf.
+%   make_plot (boolean) [optional, default = false]: = true to plot data near the interface.
+%
+%   OUTPUTS:
+%   data_prof (structure): updated profiling data with corrected pressure.
+%   press_atm (double): atmospheric pressure subtracted to the raw pressure
+%   to get the pressure relative to the air [dbar].
+%
+% T. Doda based on S. Piccolroaz, 09.12.2024
+%% Compute pressure relative to the atmosphere
+
+% Computed variables:
+%   - ind_prof_slow_x (n1*1 int array): indices of the data points near the
+%   interface (surface if upward, bottom if downward), based on the low
+%   frequency pressure data.
+%   - ind_prof_fast_x (n2*1 int array): indices of the data points near the
+%   interface (surface if upward, bottom if downward), based on the high
+%   frequency pressure data.
+%   - ind_prof_slow_plot (n3*1 int array): indices of the data points near the
+%   interface for plotting, based on the low
+%   frequency pressure data.
+%   - ind_prof_fast_plot (n4*1 int array): indices of the data points near the
+%   interface for plotting, based on the high
+%   frequency pressure data.
+%   - istop (n2*1 boolean array): = true where a peak in fast cond or fast
+%   temperature is detected (i.e., surface); is empty for downward
+%   profiles.
+g=9.81; % gravitational acceleration [m/s2]
+
+if nargin<6
+    make_plot=false;
+end
+if strcmp(param.info.prof_dir,'up')
+    % Correction for precise upward profiles:
+    % Identify when the sensor exits the lake looking at the
+    % discontinuity of the fast conductimeter or, when not available,
+    % of the fast thermistor. Use this information to correct the
+    % pressure. In this way, the pressure will be relative to the depth
+    % of the fast sensors.
+    irange=0.4; % look for the discontinuity within a range of 0.4 seconds around the current start of the profile
+    ind_prof_slow_x=ind_prof_slow(2,kprof)-round(irange*data_prof.fs_slow):ind_prof_slow(2,kprof)+round(irange*data_prof.fs_slow);
+    ind_prof_fast_x=ind_prof_fast(2,kprof)-round(irange*data_prof.fs_fast):ind_prof_fast(2,kprof)+round(irange*data_prof.fs_fast);
+
+    if isfield(data_prof,'C1_fast') % Use the microC data
+        istop=ischange(data_prof.gradC1(ind_prof_fast_x),'linear'); % Abrupt changes in the slope of gradC1 (=peak)
+        istop=find(istop==1,1,'first'); istop=istop-2-ceil(abs(0.001/data_prof.W_fast(ind_prof_fast_x(istop))*data_prof.fs_fast));   % shear probes are 1 mm apart from micro cond. Account also for time response (2 counts to be safe)
+    else % Use the FP07 data
+        istop=ischange(data_prof.gradT1(ind_prof_fast_x),'linear','maxnumchanges',1); % Abrupt changes in the slope of gradT1 (=peak)
+        istop=find(istop==1,1,'first'); istop=istop-5-ceil(abs(0.003/data_prof.W_fast(ind_prof_fast_x(istop))*data_prof.fs_fast));   % shear probes are 3 mm apart from micro temp. Account also for the time response: 0.007 s *512 count/s ~ 4 counts (5 counts to be safe)
+    end
+
+    if isempty(istop)
+        press_atm=0; % Assumes that pressure was already corrected with coef0?
+    else
+        press_atm = data_prof.P_fast(ind_prof_fast_x(istop));   % correction
+    end
+
+    % Correct pressure only for the specific profile
+    P_slow_corr = data_prof.P_slow-press_atm;
+    P_fast_corr = data_prof.P_fast-press_atm;
+    ind_prof_fast_plot=ind_prof_fast_x;
+    ind_prof_slow_plot=ind_prof_slow_x*data_prof.fs_fast/data_prof.fs_slow;
+else % Downward profile
+    press_atm=min(data_prof.P_slow); % Miminum pressure of the file = atmospheric pressure
+    P_slow_corr = data_prof.P_slow-press_atm;
+    P_fast_corr = data_prof.P_fast-press_atm;
+    irange=0.0; % [s], keep the first profiling index
+    ind_prof_slow_x=ind_prof_slow(1,kprof)-round(irange*data_prof.fs_slow):ind_prof_slow(1,kprof)+round(irange*data_prof.fs_slow);
+    ind_prof_fast_x=ind_prof_fast(1,kprof)-round(irange*data_prof.fs_fast):ind_prof_fast(1,kprof)+round(irange*data_prof.fs_fast);
+    ind_prof_fast_plot=ind_prof_fast_x;
+    ind_prof_slow_plot=ind_prof_slow_x*data_prof.fs_fast/data_prof.fs_slow;
+    istop=[];
+end
+
+%% Re-load the profile with pmin=0 (this part was originally in resolve_profile_all)
+data_prof.ind_prof_slow = get_profile(P_slow_corr,data_prof.W_slow,0,...
+    param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_slow);
+data_prof.ind_prof_fast  = get_profile(P_fast_corr,data_prof.W_fast,0,...
+        param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
+[~,data_prof.Nprf] = size(ind_prof_slow); % Number of profiles
+
+%% Save the corrected pressure only for the specific profile
+data_prof.P_slow=NaN(1,length(data_prof.P_slow));
+data_prof.P_slow(data_prof.ind_prof_slow(1,kprof):data_prof.ind_prof_slow(2,kprof))=P_slow_corr(data_prof.ind_prof_slow(1,kprof):data_prof.ind_prof_slow(2,kprof));
+data_prof.P_fast=NaN(1,length(data_prof.P_fast));
+data_prof.P_fast(data_prof.ind_prof_fast(1,kprof):data_prof.ind_prof_fast(2,kprof))=P_fast_corr(data_prof.ind_prof_fast(1,kprof):data_prof.ind_prof_fast(2,kprof));
+
+%% Compute the depth
+mrho = cumsum(data_prof.rhoTS)./(1:length(data_prof.rhoTS))'; % [kg/m3]
+data_prof.depth=10000*data_prof.P_slow./(mrho*g); % [m]
+
+%% Plot
+if make_plot && length(ind_prof_fast_plot)>1
+    figure
+    set(gcf, 'Units', 'centimeters', 'Position', [1 1 20 8]);
+    subplot(1,Nprf,counter)
+    plot(ind_prof_fast_plot,data_prof.P_fast(ind_prof_fast_plot),'.-k'); hold on
+    if isfield(data_prof,'C1_fast')
+        plot(ind_prof_fast_plot,normalize(data_prof.C1_fast(ind_prof_fast_plot))/2,'-g');
+    end
+    plot(ind_prof_fast_plot,normalize(data_prof.T1_fast(ind_prof_fast_plot))/2,'.-r');
+    plot(ind_prof_fast_plot,data_prof.W_fast(ind_prof_fast_plot),'.-k');
+    plot(ind_prof_fast_plot,data_prof.sh1(ind_prof_fast_plot)/50,'.-m'); hold on
+    plot(ind_prof_slow_plot,normalize(data_prof.(CTD_C)(ind_prof_slow_x))/2,'.-b'); hold on
+    plot([ind_prof_fast_plot(1) ind_prof_fast_plot(end)],[0 0],'--k');
+    if ~isempty(istop)
+        plot([ind_prof_fast_plot(istop) ind_prof_fast_plot(istop)],[-1 1],'--g');
+    end
+    ylim([-1 1])
+end
+
+
+end

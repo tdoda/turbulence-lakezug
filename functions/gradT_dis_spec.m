@@ -1,4 +1,4 @@
-function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot,folder_out,filename,profID)
+function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot)
 
 % GOAL
 % Estimate of TKE and temperature variance dissipation rates eps and Xi by 
@@ -45,8 +45,8 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % MAD_T: Mean Absolute Deviation between observed and empirical spectra using MLE fitting
 % MADc: Threshold for the Mean Absolute Deviation between observed and empirical spectra
 % LR: likelihood ratio
-% kL: Lower integration wavenuber (cpm)
-% kU: Upper integration wavenuber (cpm)
+% kL: Lower integration wavenumber (cpm)
+% kU: Upper integration wavenumber (cpm)
 % krange: wavenumber range used for spectral integration 
 % kP: wavenumber corresponding to the peak of the fitted theoretical spectrum (cpm)
 % fit_flag_ST: acceptance flag of Xi_ST according to quality metrics: 0 rejected, 1 accepted
@@ -342,17 +342,17 @@ if cont
     LR = log10(exp(1))*LR;   % Likelihoo ratio, see eq. (16)
     kU=k(iknM0);
     krange = log10(k(iknM0)) - log10(k(ikL));
-    fit_flag_T =1;
+    fit_flag_T =0;
     if LR>2 && MAD_T<MADc*2 ...
             && krange> 0.8 ...
             && kU>2*kP && kL<kP
-        fit_flag_T =0;
+        fit_flag_T =1;
     end
     eps_T=visco*D^2*(2*pi()*kB)^4; % TKE dissipation rate
     
     %% Plots
     if plt~=0         
-        fh=figure(11);
+        fh=figure;
         clf
         set(fh,'color','white','Units', 'Centimeters', 'Position', [0,0,16,8],...
             'PaperUnits', 'Centimeters', 'PaperSize', [16,8]);
@@ -406,9 +406,7 @@ if cont
         set(gca, 'xminorgrid', 'on')
         set(gca,'MinorGridLineStyle','-','MinorGridAlpha',0.1)
         set(gca,'GridLineStyle','-')
- %       saveas(gcf,[folder_out '/Spec_z= ', num2str(mpres), ' m, sensor= ', T_string, '.pdf'])
- %       saveas(gcf,[folder_out '/Spec_z= ', num2str(mpres), ' m, sensor= ', T_string, '.png'])
-        saveas(gcf,[folder_out '/',erase(filename,'_patched'),'_profID=',num2str(profID),'_',num2str(round(min(pres),2,'significant')),'-',num2str(round(max(pres),2,'significant')), 'db_Spec=',T_string,'.pdf'])
-        saveas(gcf,[folder_out '/',erase(filename,'_patched'),'_profID=',num2str(profID),'_',num2str(round(min(pres),2,'significant')),'-',num2str(round(max(pres),2,'significant')), 'db_Spec=',T_string,'.png'])
+%         saveas(gcf,[folder_out '/Spec_z= ', num2str(mpres), ' m, sensor= ', T_string, '.pdf'])
+%         saveas(gcf,[folder_out '/Spec_z= ', num2str(mpres), ' m, sensor= ', T_string, '.png'])  
     end
 end

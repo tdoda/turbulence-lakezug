@@ -1,12 +1,17 @@
 %% cal_FP07_in_situ
 
-%%  EPFL (Sebastiano Piccolroaz) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Eawag (Tomy Doda) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   2024-12-06: modified to deal with cfg files that do not contain two
+%   beta coefficients (e.g., VMP).
+%%  EPFL (Sebastiano Piccolroaz) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   2020-04-22: Function modified allowing to calibrate the fast
 %   thermistors without the need to save the mat-file of the data. All
 %   plots have been removed. At the end of the script, the cfg file is 
 %   updated with the calibrated parameters. 
 %   Overall, this script allows to save computational time. The function 
 %   has been tested against the original one, and the results are the same.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Determine calibration coefficients for a thermistor probe using in situ data.
@@ -395,22 +400,49 @@ T_calibrated = T_calibrated - 273.15;
 % -- Update of the cfg file ---------------------------------------
 %------------------------------------------------------------------
 A = regexp(fileread([cfgfile '.cfg']),'\n','split');
-idx_T = find(endsWith(A,['= ' T_string]) | contains(A,['= ' [T_string '_']]));
 idx_beta1 = find(contains(A,'beta_1'));
 idx_beta2 = find(contains(A,'beta_2'));
+if isempty(idx_beta2)
+    if isempty(idx_beta1)
+        idx_beta1 = find(contains(A,'beta')); % Only one coefficient specified
+    end
+    for k=1:length(idx_beta1) % Add beta_2 field
+        A=[A(1:idx_beta1(k)),{'beta_2      = '},A(idx_beta1(k)+1:end)];
+    end
+    idx_beta2 = find(contains(A,'beta_2'));
+end
+idx_T = find(endsWith(A,['= ' T_string]) | contains(A,['= ' [T_string '_']]));
+add_space=true;
+if isempty(idx_T)
+    %idx_T = find(endsWith(A,['=' T_string]) | contains(A,['=' [T_string '_']])); % No space
+    idx_T = find(contains(A,['=' T_string])); % No space
+    add_space=false;
+end
 idx_T0 = find(contains(A,'T_0'));
 
-idx_beta1 = idx_beta1( idx_beta1 > idx_T(1) & idx_beta1 < idx_T(2));
-idx_beta2 = idx_beta2( idx_beta2 > idx_T(1) & idx_beta2 < idx_T(2));
+idx_beta1 = idx_beta1( idx_beta1 > idx_T(1) & idx_beta1 < idx_T(2)); % Beta1 coefficient of the specific T probe
+idx_beta2 = idx_beta2( idx_beta2 > idx_T(1) & idx_beta2 < idx_T(2)); % Beta2 coefficient of the specific T probe
 idx_T0 = idx_T0( idx_T0 > idx_T(1) & idx_T0 < idx_T(2));
 
-A(idx_beta1) =  {['beta_1      = ', num2str(beta(1),'%15.6f')]};
-if order==2
-    A(idx_beta2) =  {['beta_2      = ', num2str(beta(2),'%15.6f')]};
-    A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
+if add_space
+    A(idx_beta1) =  {['beta_1      = ', num2str(beta(1),'%15.6f')]};
+    if order==2
+        A(idx_beta2) =  {['beta_2      = ', num2str(beta(2),'%15.6f')]};
+        A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
+    else
+        A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
+        A(idx_beta2)=[]; 
+    end
 else
-    A(idx_T0) =  {['T_0      = ', num2str(T_0,'%15.6f')]};
-    A(idx_beta2)=[]; 
+    A(idx_beta1) =  {['beta_1=', num2str(beta(1),'%15.6f')]};
+    if order==2
+        A(idx_beta2) =  {['beta_2=', num2str(beta(2),'%15.6f')]};
+        A(idx_T0) =  {['T_0=', num2str(T_0,'%15.6f')]};
+    else
+        A(idx_T0) =  {['T_0=', num2str(T_0,'%15.6f')]};
+        A(idx_beta2)=[]; 
+    end
+
 end
 
 fid = fopen([cfgfile '.cfg'], 'w');

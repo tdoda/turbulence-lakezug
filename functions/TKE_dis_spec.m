@@ -1,4 +1,4 @@
-function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU]=TKE_dis_spec(pres,x0,px0,k1,k2,fn,visco,W,sL,sOV,noise_corr,sh_number,plt,presplt,Tplt,folder_out,filename,profID)
+function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU]=TKE_dis_spec(pres,x0,px0,k1,k2,fn,visco,W,sL,sOV,noise_corr,sh_number,plt,presplt,Tplt)
 
 % GOAL
 % Estimate of TKE dissipation rate eps_S by integration of the measured
@@ -152,7 +152,7 @@ if k(2)<k2
     while flag==0
         eps_S=7.5*visco*sum( (PSD(ik1+1:ik3)+PSD(ik1:ik3-1)).* (k(ik1+1:ik3)-k(ik1:ik3-1)) )/2;
         %%%%
-        kK=0.121*(eps_S./visco^3).^(1/4);  % 0.76 of kK. kK=Kolmogorov wavenumber, 0.121 ~ 0.76/(2*Pi)
+        kK=0.121*(eps_S./visco^3).^(1/4);  % 0.121=0.76/(2*pi) (0.76 of kK). kK=Kolmogorov wavenumber
         %%%%
         if abs(kK-kK0)<=2*dk
             flag = 1;
@@ -198,14 +198,14 @@ if k(2)<k2
     %% Evaluation of MAD
     MAD_S = mean( abs( (PSD(ik1:ik3)./NAS(ik1:ik3)) - mean(PSD(ik1:ik3)./NAS(ik1:ik3)) )  );
     MADf = mean( abs( (PSD(ik1:ikn)./NAS(ik1:ikn)) - mean(PSD(ik1:ikn)./NAS(ik1:ikn)) )  );
-    fit_flag_S = 1;
+    fit_flag_S = 0;
     if MAD_S<2*MADc
-        fit_flag_S = 0;
+        fit_flag_S = 1;
     end
     
     %% Plots
     if plt~=0        
-        fh=figure(11);
+        fh=figure;
         clf
         set(fh,'color','white','Units', 'Centimeters', 'Position', [0,0,16,8],...
             'PaperUnits', 'Centimeters', 'PaperSize', [16,8]);
@@ -252,9 +252,8 @@ if k(2)<k2
         set(gca,'MinorGridLineStyle','-','MinorGridAlpha',0.1)
         set(gca,'GridLineStyle','-')
         
-%        saveas(gcf,[folder_out '/Spec_z= ', num2str(mpres), ' db, sensor = ' sh_number '.pdf'])
-        saveas(gcf,[folder_out '/',erase(filename,'_patched'),'_profID=',num2str(profID),'_',num2str(round(min(pres),2,'significant')),'-',num2str(round(max(pres),2,'significant')), 'db_Spec=',sh_number,'.pdf'])
-        saveas(gcf,[folder_out '/',erase(filename,'_patched'),'_profID=',num2str(profID),'_',num2str(round(min(pres),2,'significant')),'-',num2str(round(max(pres),2,'significant')), 'db_Spec=',sh_number,'.png'])
+%         saveas(gcf,['/Spec_z= ', num2str(mpres), ' db, sensor = ' sh_number '.pdf'])
+%         saveas(gcf,['/Spec_z= ', num2str(mpres), ' db, sensor = ' sh_number '.png'])
     end
 else
     eps_S=NaN; W=NaN; fit_flag_S=NaN; MAD_S=NaN; MADc=NaN;

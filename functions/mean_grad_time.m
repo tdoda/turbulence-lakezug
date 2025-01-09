@@ -1,5 +1,19 @@
-function grX=mean_grad(pres0,x,pres,pint,timef)
-    
+function grX=mean_grad_time(pres0,x,pres,pint,timef)
+%MEAN_GRAD_TIME Computes the average temporal gradient of x for each bin.
+%
+%   INPUTS:
+%   pres0 (1*n double array): pressure profile [dbar]
+%   x (1*n double array): variable for which the averaged gradient is
+%   computed
+%   pres (1*nbin double array): pressure of the bins [dbar]
+%   pint (double): bin size [dbar]
+%   timef (1*n double array): time values [s]
+%
+%   OUTPUTS:
+%   grX (1*nbin double array): temporal gradient of x in each bin
+% 
+% T. Doda based on S. Piccolroaz, 19.12.2024
+%%  
     grX=nan(size(pres));
     sgrX=nan(size(pres));
 
