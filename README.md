@@ -2,10 +2,7 @@
 
 ## Introduction
 
-This is a Renku project - basically a git repository with some
-bells and whistles. You'll find we have already created some
-useful things like `data` and `notebooks` directories and
-a `Dockerfile`.
+This repository contains the data and scripts related to turbulence measurements in Lake Zug that are part of the Interbasin Exchanges in Stratified Lakes (IBEX) project.
 
 ## Working with the project
 
@@ -17,22 +14,47 @@ To work with the project anywhere outside the Renku platform,
 click the `Settings` tab where you will find the
 git repo URLs - use `git` to clone the project on whichever machine you want.
 
-### Changing interactive session dependencies
-
 Initially we install a very minimal set of packages to keep the images small.
 However, you can add python and conda packages in `requirements.txt` and
 `environment.yml` to your heart's content. If you need more fine-grained
 control over your environment, please see [the documentation](https://renku.readthedocs.io/en/stable/topic-guides/customizing-sessions.html).
 
-## Project configuration
+## Sensors
 
-Project options can be found in `.renku/renku.ini`. In this
-project there is currently only one option, which specifies
-the default type of environment to open, in this case `/lab` for
-JupyterLab. You may also choose `/tree` to get to the "classic" Jupyter
-interface.
+*Add details about the VMP here...*
 
-## Moving forward
+## Geospatial information
 
-Once you feel at home with your project, we recommend that you replace
-this README file with your own project documentation! Happy data wrangling!
+*Add information about the coordinates of the profiles*
+
+## Temporal coverage
+
+*Add information about the field campaigns*
+
+## Structure of the repository
+
+### Folder `data`
+VMP data organized in levels. 
+*Add details about the data here*
+
+### Folder `analysis`
+Scripts performing data analysis.
+*Add details about the subfolders here*
+
+### Folder `functions`
+Functions used by the analysis scripts.
+
+### Folder `figures`
+Figures showing the results of the analyses.
+
+### Folder `notebooks`
+Jupyter notebooks to visualized the data (*not available yet*).
+
+## Future updates
+
+- Export of the data as netcdf files
+- Jupyter notebook to visualize the data
+
+## Collaborators
+
+## Contact
