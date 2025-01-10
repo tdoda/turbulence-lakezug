@@ -60,10 +60,10 @@ end
 
 %% Make plot
 if make_plot
-    figure
+    figure('Units','centimeters','Position',[1 1 18 10])
     leg={};
 
-    subplot(1,2,1) % Before calibration
+    subplot(1,3,1) % Before calibration
     if param.config.T1
         plot(T1_precal,data_prof.P_fast,'LineWidth',1)
         hold on
@@ -82,7 +82,7 @@ if make_plot
     ylabel('Pressure [dbar]')
     title(gca,'Before calibration')
 
-    subplot(1,2,2) % Before calibration
+    subplot(1,3,2) % After calibration
     if param.config.T1
         plot(data_prof.T1_fast,data_prof.P_fast,'LineWidth',1)
         hold on
@@ -96,6 +96,22 @@ if make_plot
     xlabel('Temperature [°C]')
     title(gca,'After calibration')
 
+    subplot(1,3,3) % x-x comparison after calibration
+    leg3={};
+    p3=[];
+    if param.config.T1
+        p3(end+1)=plot(data_prof.(param.CTD_T),interp1(data_prof.P_fast,data_prof.T1_fast,data_prof.P_slow),'.');
+        hold on
+        leg3{end+1}='T1';
+    end
+    if param.config.T2
+        p3(end+1)=plot(data_prof.(param.CTD_T),interp1(data_prof.P_fast,data_prof.T2_fast,data_prof.P_slow),'.');
+        leg3{end+1}='T2';
+    end 
+    plot(get(gca,'XLim'),get(gca,'XLim'),'--k','LineWidth',1)
+    xlabel('CTD-T [°C]')
+    ylabel('FP07-T [°C]')
+    legend(p3,leg3)
 
 end
 
