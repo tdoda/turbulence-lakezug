@@ -21,7 +21,7 @@ make_plot_prof = true; % Make profile-related plots.
 make_plot_spectra = true; % Make spectra plots (temperature and shear spectra).
 
 addpath(odas_folder)
-addpath("..\..\functions\") % Add microstructure functions
+addpath("..\..\functions\microstructure\") % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
 
@@ -55,7 +55,8 @@ for kf=1:length(param.filename_list)
         if strcmpi(gohead,'y')
             rmdir(folder_out,'s')
         elseif strcmpi(gohead,'n')
-            error('>>> Stop')
+            disp('>>> Stop!')
+            return
         else
             error('>>> Wrong input. Stop')
         end
@@ -67,16 +68,11 @@ for kf=1:length(param.filename_list)
     %default_parameters.speed_tau=0.68/0.99999*2/64; % To avoid smoothing W
     data_prof=odas_p2mat([param.folder,param.filename_list{kf},'.P'],default_parameters);
    
-    data_prof.tnum_slow=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_slow/86400;
-    data_prof.tdate_slow=datetime(data_prof.tnum_slow,'ConvertFrom','datenum');
-    data_prof.tnum_fast=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_fast/86400;
-    data_prof.tdate_fast=datetime(data_prof.tnum_fast,'ConvertFrom','datenum');
    
-    %% Modify and patch the config file
+    %% Modify and patch the config file (data_prof is reloaded)
 
     [data_prof,modified_data_file,cfgfile_mod] = get_config(param,data_prof,folder_out,modify_cfg,kf);
     
-
     %% Extract the profiles
     % Start and end indices of the profiles
     ind_prof_slow = get_profile(data_prof.P_slow,data_prof.W_slow,param.info.pmin,...
@@ -119,13 +115,21 @@ for kf=1:length(param.filename_list)
         clear pmin_ql pmax_ql diss_quick
     end
     
-    %% Calibration of the fast thermistors
+    %% Calibration of the fast thermistors (data_prof is reloaded)
 
     if calibrate_FP07
         [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,modified_data_file,cfgfile_mod,make_plot_prof);
     end
 
     DATA(kf)=data_prof;
+
+    %% Add variables to data_prof
+    data_prof.tnum_slow=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_slow/86400;
+    data_prof.tdate_slow=datetime(data_prof.tnum_slow,'ConvertFrom','datenum');
+    data_prof.tnum_fast=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_fast/86400;
+    data_prof.tdate_fast=datetime(data_prof.tnum_fast,'ConvertFrom','datenum');
+
+    data_prof.filename=param.filename_list{kf};
 
     %% Compute salinity and density 
     [data_prof.rhoTS,data_prof.Cond_corr,data_prof.Sal,~] = compute_rho_salinity(lakename,data_prof.(param.CTD_T),...
@@ -167,7 +171,7 @@ for kf=1:length(param.filename_list)
         % Turbulence analysis
         tic
         [BINNED0{counter},SLOW0{counter}, FAST0{counter}] = ...
-            resolve_turbulence(data_prof,kprof,param,filename,folder_out,counter,make_plot_prof,make_plot_spectra);
+            resolve_turbulence(data_prof,kprof,param,folder_out,counter,make_plot_prof,make_plot_spectra);
         toc  
 
         % ------------------------------------------------------------------
