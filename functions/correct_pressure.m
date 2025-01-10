@@ -86,16 +86,16 @@ else % Downward profile
 end
 
 %% Re-load the profile with pmin=0 (this part was originally in resolve_profile_all)
-data_prof.ind_prof_slow = get_profile(P_slow_corr',data_prof.W_slow,0,...
+data_prof.ind_prof_slow = get_profile(P_slow_corr,data_prof.W_slow,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_slow);
-data_prof.ind_prof_fast  = get_profile(P_fast_corr',data_prof.W_fast,0,...
+data_prof.ind_prof_fast  = get_profile(P_fast_corr,data_prof.W_fast,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
 [~,data_prof.Nprf] = size(ind_prof_slow); % Number of profiles
 
 %% Save the corrected pressure only for the specific profile
-data_prof.P_slow=NaN(1,length(data_prof.P_slow));
+data_prof.P_slow=NaN(length(data_prof.P_slow),1);
 data_prof.P_slow(data_prof.ind_prof_slow(1,kprof):data_prof.ind_prof_slow(2,kprof))=P_slow_corr(data_prof.ind_prof_slow(1,kprof):data_prof.ind_prof_slow(2,kprof));
-data_prof.P_fast=NaN(1,length(data_prof.P_fast));
+data_prof.P_fast=NaN(length(data_prof.P_fast),1);
 data_prof.P_fast(data_prof.ind_prof_fast(1,kprof):data_prof.ind_prof_fast(2,kprof))=P_fast_corr(data_prof.ind_prof_fast(1,kprof):data_prof.ind_prof_fast(2,kprof));
 
 %% Compute the depth
