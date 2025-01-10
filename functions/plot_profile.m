@@ -7,7 +7,8 @@ pplot=[info.pmin,info.pmax];
 
 
 % 1. Pressure time series
-figure(1)
+figure('Units','centimeters','Position',[1 1 18 15])
+
 clf
 subplot(4,4,[1 4])
 plot(DATA.t_slow/60,DATA.P_slow) % Complete pressure time series in the file
@@ -68,23 +69,25 @@ plot(FAST.velocity,FAST.pressure,'-k'); hold on;
 plot(get(gca,'xlim'),[pmaxplot pmaxplot],'--k')
 set(gca,'ydir','reverse');
 xlabel('W (m/s)');yticklabels([]);ylim(pplot);
-ax2=axes('Position',ax1.Position,'XAxisLocation','top',...
-    'YAxisLocation','right','color','none',...
-    'xColor','r','yColor','k');
-set(ax1,'box','off')
-line(SLOW.Incl_X,SLOW.pressure,'color','r'); set(gca,'ydir','reverse');
-xlabel('Inclination [°]')
-yticklabels([]); xlim([-5 5]);
+if ~isempty(find(~isnan(SLOW.Incl_x),1)) % At least one non NaN value
+    ax2=axes('Position',ax1.Position,'XAxisLocation','top',...
+        'YAxisLocation','right','color','none',...
+        'xColor','r','yColor','k');
+    set(ax1,'box','off')
+    line(SLOW.Incl_x,SLOW.pressure,'color','r'); set(gca,'ydir','reverse');
+    xlabel('Inclination [°]')
+    yticklabels([]); xlim([-5 5]);
+end
 
 
 % 5. add despiked and HP signals to the plot
 subplot(4,4,[5,9,13])
 if param.config.S1
-    plot(FAST.fast_sh1_hp,FAST.pressure)
+    plot(FAST.fast_S1_hp,FAST.pressure)
 end
 
 if param.config.S2
-    plot(FAST.fast_sh2_hp+10,FAST.pressure)
+    plot(FAST.fast_S2_hp+10,FAST.pressure)
 end
 
 subplot(4,4,[6,10,14])
