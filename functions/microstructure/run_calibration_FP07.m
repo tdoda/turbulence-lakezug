@@ -1,9 +1,12 @@
-function [data_prof,cfgfile_cal] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,modified_data_file,cfgfile_mod,make_plot)
+function [data_prof,cfgfile_cal] = run_calibration_FP07(param,data_prof,CTD_T,ind_prof,Nprf,modified_data_file,cfgfile_mod,make_plot,folder_out)
 %RUN_CALIBRATION_FP07 Calibrate FP07
 %   Detailed explanation goes here
 % make_plot: optional (=False by default)
-
+% folder_out: optional
 %%
+if nargin<9
+    folder_out='';
+end
 if nargin<8
     make_plot=false;
 end
@@ -112,6 +115,13 @@ if make_plot
     xlabel('CTD-T [°C]')
     ylabel('FP07-T [°C]')
     legend(p3,leg3)
+
+    
+    if ~exist([folder_out,'Figures'],'dir')
+        mkdir([folder_out,'Figures'])
+    end
+    saveas(gcf,[folder_out,'Figures\FP07_calibration.fig'])
+    exportgraphics(gcf,[folder_out,'Figures\FP07_calibration.png'],'Resolution',400)
 
 end
 
