@@ -1,4 +1,4 @@
-function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot)
+function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot,folder_out)
 %CORRECT_PRESSURE Compute pressure with respect to the atmospheric
 %pressure.
 %
@@ -13,6 +13,8 @@ function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,in
 %   frequency pressure data.
 %   kprof (int): profile index between 1 and Nprf.
 %   make_plot (boolean) [optional, default = false]: = true to plot data near the interface.
+%   folder_out (str) [optional, default = '']: name of the foler where the
+%   figure is saved.
 %
 %   OUTPUTS:
 %   data_prof (structure): updated profiling data with corrected pressure.
@@ -39,7 +41,9 @@ function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,in
 %   temperature is detected (i.e., surface); is empty for downward
 %   profiles.
 g=9.81; % gravitational acceleration [m/s2]
-
+if nargin<7
+    folder_out='';
+end
 if nargin<6
     make_plot=false;
 end
@@ -153,6 +157,12 @@ if make_plot
     title(gca,'Fast data')
 
     linkaxes([ax1,ax2],'y')
+
+    if ~exist([folder_out,'Figures'],'dir')
+        mkdir([folder_out,'Figures'])
+    end
+    saveas(gcf,[folder_out,'Figures\Pcorrection',num2str(kprof),'.fig'])
+    exportgraphics(gcf,[folder_out,'Figures\Pcorrection',num2str(kprof),'.png'],'Resolution',400)
 
 end
 
