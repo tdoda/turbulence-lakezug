@@ -50,13 +50,18 @@ Functions used by the analysis scripts.
 Figures showing the results of the analyses.
 
 ### Folder `notebooks`
-Jupyter notebooks to visualized the data (*not available yet*).
+Jupyter notebooks to visualize the data (*not available yet*).
 
 ## Future updates
 
-- Export of the data as netcdf files
-- Jupyter notebook to visualize the data
+- Export of the data as netcdf files (including level 1)
+- Jupyter notebooks to visualize the data
 
 ## Collaborators
 
+- **Data collection**: Tomy Doda, Damien Bouffard, Jemima Rama, Michael Plüss
+- **Scripts and analysis**: Tomy Doda, Oscar Sepúlveda Steiner, Bieito Fernández Castro, Sebastiano Piccolroaz, Hugo N. Ulloa, Damien Bouffard
+
 ## Contact
+- [Tomy Doda](mailto:tomy.doda@unil.ch)
+- [Damien Bouffard](mailto:damien.bouffard@eawag.ch)
