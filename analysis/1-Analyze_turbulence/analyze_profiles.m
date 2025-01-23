@@ -9,7 +9,7 @@ clc
 lakename='Zug'; % Options: 'Zug' or 'default' (see load_parameters_Zug function)
 instrument='VMP'; % Options: 'VMP' or 'microCTD'
 direction = 'down'; % Direction of the profile, options: 'up' and 'down'
-general_data_folder='..\..\data\'; % Where fieldwork data is stored
+general_data_folder='..\..\data\VMP\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\';
 date_campaign="20241204"; % Should match the date in "load_parameters" function except if "default" is used
 run_quick_look=true; % Apply quick_look function from Rockland (shear dissipation only)
