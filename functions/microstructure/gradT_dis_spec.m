@@ -9,7 +9,7 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % x0: grad temperature vector (°C/m)
 % k1: minimium wavenumber for integration (small number, e.g., 0.1 cpm)
 % fn: maximum frequency for calculations (90% of anti-aliasing filter f_AA. E.g., if f_AA=98 Hz, fn=0.9*98=88.2 Hz)
-% kB_S: Batchelor wavenumber determined from shear probe used to caluclate Xi_ST (if 0 does not calculate. When two sh are available and accepted, the average of kB_S is used.)
+% kB_S: Batchelor wavenumber determined from shear probe used to calculate Xi_ST (if 0 does not calculate. When two sh are available and accepted, the average of kB_S is used.)
 % W: mean profiling speed (m/s)
 % sL: length of segments for fft (scans)
 % sOV: overlap for fft (scans)
