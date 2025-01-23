@@ -22,35 +22,60 @@ However, you can add python and conda packages in `requirements.txt` and
 control over your environment, please see [the documentation](https://renku.readthedocs.io/en/stable/topic-guides/customizing-sessions.html).
 
 ## Sensors
+### VMP profiler
 
-*Add details about the VMP here...*
+<font color='red'>*Add details about the VMP here...*</font>
+
+### CTD profiler
+
+<font color='red'>*Add details about the CTD here.*</font>
 
 ## Geospatial information
 
-*Add information about the coordinates of the profiles*
+<font color='red'>*Add information about the coordinates of the profiles.*</font>
 
 ## Temporal coverage
 
-*Add information about the field campaigns*
+<font color='red'>*Add information about the field campaigns.*</font>
 
 ## Structure of the repository
 
 ### Folder `data`
-VMP data organized in levels. 
-*Add details about the data here*
+VMP and CTD data organized in levels. 
+
+<font color='red'>*Add details about the data here.*</font>
+
+<br />
 
 ### Folder `analysis`
 Scripts performing data analysis.
-*Add details about the subfolders here*
+#### Folder `1-Analyze_turbulence`
+<font color='red'>*Add details about the turbulence analysis here.*</font>
+
+#### Folder `1-Analyze_ctd`
+
+- Script `read_ctd.py`: read and export the CTD data to netCDF files.
+
+<br />
 
 ### Folder `functions`
 Functions used by the analysis scripts.
 
+<font color='red'>*Add more information here.*</font>
+
+<br />
+
 ### Folder `figures`
 Figures showing the results of the analyses.
 
+<font color='red'>*Add more information here.*</font>
+
+<br />
+
 ### Folder `notebooks`
-Jupyter notebooks to visualize the data (*not available yet*).
+Jupyter notebooks to visualize the data:
+- CTD data: `plot_ctd.ipynb`
+- VMP data: <font color='red'>*not available yet*</font>
 
 ## Future updates
 
