@@ -6,14 +6,14 @@ function [] = plot_bin_profile(SLOW,BIN,param)
 info=param.info;
 
 pmin = info.pmin - info.dpD/2;
-pmax = pres(find(isfinite(BIN.temperature),1,'last')) + info.dpD/2;
+pmax = BIN.pressure(find(isfinite(BIN.temperature),1,'last')) + info.dpD/2;
 
-figure
+figure('Units','centimeters','Position',[1 1 18 18])
 clf
-set(gcf, 'PaperUnits', 'centimeters');
-set(gcf, 'PaperSize', [29 20]);
-set(gcf, 'PaperPositionMode', 'manual');
-set(gcf, 'PaperPosition', [0 0 29 20]);
+% set(gcf, 'PaperUnits', 'centimeters');
+% set(gcf, 'PaperSize', [29 20]);
+% set(gcf, 'PaperPositionMode', 'manual');
+% set(gcf, 'PaperPosition', [0 0 29 20]);
 
 % 1. Temperature and salinity profiles
 ax1=subplot(2,4,1);
@@ -37,26 +37,27 @@ set(gca,'YDir','reverse')
 
 % 2. Speed, Chl-a & turbidity in bins
 ax3=subplot(2,4,2);
-plot(BIN.speed,BIN.pressure,'.-k','linewidth',1,'markersize',4)
+p1=plot(BIN.speed,BIN.pressure,'.-k','linewidth',1,'markersize',4);
 xlabel('W (db/s)')
 ylim([pmin,pmax])
 set(gca,'yticklabel',[])
 set(gca,'YDir','reverse')
 grid('on')
 ax4=axes('Position',ax3.Position);
-xlabel('Chl-Turb','color','g')
 set(ax3,'box','off')
-plot(BIN.chlorophyll, BIN.pressure,'g', 'parent' , ax4,'linewidth',1)
+p2=plot(BIN.chlorophyll, BIN.pressure,'g', 'parent' , ax4,'linewidth',1);
 hold on
-plot(BIN.turbidity, BIN.pressure,'r', 'parent' , ax4,'linewidth',1)
+p3=plot(BIN.turbidity, BIN.pressure,'r', 'parent' , ax4,'linewidth',1);
 set(ax4,'XAxisLocation','top',...
     'YAxisLocation','right',...
     'Color','none',...
     'XColor','g','YColor','k');
+xlabel(sprintf('Chl [%s]-Turb [%s]',param.unit_Chl,param.unit_Turb),'color','k')
 yticklabels([])
 ylim([pmin,pmax])
 set(gca,'yticklabel',[])
 set(gca,'YDir','reverse')
+legend([p1,p2,p3],{'W','Chl-a','Turb'})
 
 % 3. Epsilon (T1, T2, S1, S2) in bins
 subplot(2,4,3)
@@ -108,16 +109,16 @@ title(datestr(SLOW.datenum,'yyyy-mm-dd HH:MM:SS'))
 subplot(2,4,4)
 leg_entries={};
 if param.config.T1
-    plot(BIN.Xi_T1,BIN.pressure,'.-','linewidth',1,'markersize',4);
+    p1=plot(BIN.Xi_T1,BIN.pressure,'.-','linewidth',1,'markersize',4);
     hold on
-    plot(BIN.Xi_ST1,BIN.pressure,'--','linewidth',1,'color',l1.Color)
+    plot(BIN.Xi_ST1,BIN.pressure,'--','linewidth',1,'color',p1.Color)
     leg_entries(end+1:end+2)={'T01','ST01'};
 end
 
 if param.config.T2
-    plot(BIN.Xi_T2,BIN.pressure,'.-','linewidth',1,'markersize',4);
+    p2=plot(BIN.Xi_T2,BIN.pressure,'.-','linewidth',1,'markersize',4);
     hold on
-    plot(BIN.Xi_ST2,BIN.pressure,'--','linewidth',1,'color',l2.Color)
+    plot(BIN.Xi_ST2,BIN.pressure,'--','linewidth',1,'color',p2.Color)
     leg_entries(end+1:end+2)={'T02','ST02'};
 end
 leg=legend(leg_entries,'fontsize',7,'location','best');
@@ -163,7 +164,7 @@ set(gca,'YDir','reverse')
 set(gca,'xscale','log')
 xlim([1e-9,1e0])
 %line([D,D],ylim(),'color',[0.5,0.5,0.5])
-lot(BIN.Diff,BIN.pressure,'color',[0.5,0.5,0.5]) % Plot molecular diffusivity profile
+plot(BIN.Diff,BIN.pressure,'color',[0.5,0.5,0.5]) % Plot molecular diffusivity profile
 leg_entries{end+1}='molecular';
 leg=legend(leg_entries,'fontsize',7,'location','best');
 leg.ItemTokenSize = [7,7];
