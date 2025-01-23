@@ -38,7 +38,7 @@ if (ncA~=ncsh)
     disp('Error: number of columns of AA and sh is not the same')
     pause
 else
-    nc=ncsh;
+    nc=ncsh; % Number of shear sensors
 end
 
 %% Delete NaN and detrend
@@ -73,12 +73,12 @@ dof = 1.9*NsegM; %according to ODAS 4.4
 MADc = sqrt(2/dof);
 
 %% Compute raw spectrum PSD0
-if nc==1
+if nc==1 % Only one shear sensor
     % This function is provided by RSI in the ODAS libraries.
     % Alternatively, pwelch can be used obtaining comparable results.
     [PSD0,k] = csd_odas(x,x,sL,Fs,[],sOV,'linear');
     %     [PSD0,k] = pwelch(x-nanmean(x),hann(sL),sOV,sL,Fs,'onesided');
-elseif nc==2
+elseif nc==2 % Two shear sensors
     if strcmp(sh_number,'sh1')
         column_index=1;
     elseif strcmp(sh_number,'sh2')
@@ -171,6 +171,15 @@ if k(2)<k2
     end
     kU=k(ik3);   % Upper integration limit
     kL=k(ik1);   % Lower integration limit
+    if ik3<ik1+1
+        disp('Shear epsilon (%s) cannot be calculated because of too low Kolmogorov scale',sh_number)
+        % Leave it returning an error in that case
+        % eps_S=NaN;
+        % MAD_S=NaN;
+        % MADc=NaN;
+        % fit_flag_S=NaN;
+        return
+    end
     eps_S=7.5*visco*sum( (PSD(ik1+1:ik3)+PSD(ik1:ik3-1)).* (k(ik1+1:ik3)-k(ik1:ik3-1)) )/2;
     kK=1/(2*pi())*(eps_S./visco^3).^(1/4); % Kolmogorov wavenumber
     
