@@ -54,7 +54,8 @@ end
 
 %% Instrument-specific values
 
-% About k_HP_cut: low-frequency motions of the free-falling profiler (fluctuations with the scales corresponding
+% About k_HP_cut: low-frequency motions of the free-falling profiler 
+% (fluctuations with the scales corresponding
 % to half of the instrument length) can be a source of low-frequency noise in the microstructure
 % shear signal (see DOI: 10.1016/j.pocean.2006.07.003). 
 % MicroCTD length = 1 m --> k_HP_cut = 0.5 cpm (or m-1)
@@ -66,6 +67,8 @@ if strcmp(param.instrument,'VMP')
     param.CTD_C='SBC';
     param.CTD_Chl='FL';
     param.CTD_Turb='NTU';
+    param.unit_Chl='ppb';
+    param.unit_Turb='FTU';
     param.info.k_HP_cut = 0.85;
 elseif strcmp(param.instrument,'microCTD')
     param.SNname='310'; 
@@ -73,6 +76,8 @@ elseif strcmp(param.instrument,'microCTD')
     param.CTD_C='JAC_C';
     param.CTD_Chl='Chlorophyll';
     param.CTD_Turb='Turbidity';
+    param.unit_Chl='ppb';
+    param.unit_Turb='FTU';
     param.info.k_HP_cut = 0.5;
 else
     error('Wrong instrument name')
@@ -201,12 +206,47 @@ param.info.dpD = 1; % Bin size [m]
 if strcmp(date,'20211110') % Oscar's campaign #1
     param.folder = [general_data_folder,'20211110\Level0\'];
     param.filename_list={'VMP001','VMP002','VMP003','VMP005'}; % Several files can be listed here
-    
+    % param.filename_list={'VMP001'};
+
     % Set P offset and sh probe sensitivity
     % param.offset_P=-0.33;
     % Use shear sensitivities specified in config file: 
-    % param.cfgfile = 'setup_EAWAG_2018_07_18_OS';
-    param.cfgfile = 'setup_test';
+    param.cfgfile = 'setup_EAWAG_2018_07_18_OS';
+
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=true;
+    param.config.uC1=true;
+    param.config.uC2=true;
+%**************************************************************************
+elseif strcmp(date,'20241204') 
+    param.folder = [general_data_folder,'20241204\Level0\'];
+    % param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006','VMP008'}; % Several files can be listed here
+    param.filename_list={'VMP003'}; % Several files can be listed here
+
+    % Set P offset and sh probe sensitivity
+    % param.offset_P=-0.33;
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_2024_12_04';
+
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=true;
+    param.config.uC1=true;
+    param.config.uC2=true;
+%**************************************************************************
+elseif strcmp(date,'20241205') 
+    param.folder = [general_data_folder,'20241205\Level0\'];
+    param.filename_list={'VMP001','VMP002','VMP003','VMP004','VMP005','VMP006','VMP007','VMP008','VMP010','VMP011'}; % Several files can be listed here
+    
+
+
+    % Set P offset and sh probe sensitivity
+    % param.offset_P=-0.33;
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_2024_12_05';
 
     param.config.T1=true;
     param.config.T2=true;
