@@ -11,8 +11,8 @@ instrument='VMP'; % Options: 'VMP' or 'microCTD'
 direction = 'down'; % Direction of the profile, options: 'up' and 'down'
 general_data_folder='..\..\data\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\';
-date_campaign="20211110"; % Should match the date in "load_parameters" function except if "default" is used
-run_quick_look=false; % Apply quick_look function from Rockland (shear dissipation only)
+date_campaign="20241204"; % Should match the date in "load_parameters" function except if "default" is used
+run_quick_look=true; % Apply quick_look function from Rockland (shear dissipation only)
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
 calibrate_FP07=true; % Calibrate FP07
 run_dissip=false; % Compute dissipation based on Sebastiano's script
@@ -32,11 +32,10 @@ if ~isfield(param,'cfgfile') || strcmp(param.cfgfile,'')
 end
 
 %% Analyze each data file
-if run_quick_look
-    DISS_QL={};
-end
 
 for kf=1:length(param.filename_list)
+    disp('')
+    disp('*******************************************')
     fprintf("File %s (%d/%d)\n",param.filename_list{kf},kf,length(param.filename_list))
     %% show_ch?
 
@@ -47,7 +46,7 @@ for kf=1:length(param.filename_list)
     else
         tmp = [param.info.time_corr num2str(param.info.time_res,'%6.4f') ];
     end
-    folder_out = [param.folder '..\Level1\' param.filename_list{kf} '_' param.info.prof_dir num2str(param.info.dpD,'%3.1f') '_'  param.info.Tspec num2str(param.info.q,'%3.1f') ...
+    folder_out = [param.folder '..\Level2\' param.filename_list{kf} '_' param.info.prof_dir num2str(param.info.dpD,'%3.1f') '_'  param.info.Tspec num2str(param.info.q,'%3.1f') ...
         '_' param.info.int_range '_' tmp '_' param.info.npoles 'pole_nfft' num2str(param.info.num_fft)   ...
         '_' param.info.Nasmyth_spec '_' param.info.noise_corr '\'];
     if exist(folder_out, 'dir')
@@ -85,43 +84,59 @@ for kf=1:length(param.filename_list)
         continue
     end
 
-    %% Default data analysis
+    %% Calibration of the fast thermistors (data_prof is reloaded)
+
+    if calibrate_FP07
+        [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,modified_data_file,cfgfile_mod,make_plot_prof,folder_out);
+    end
+
+    DATA(kf)=data_prof;
+
+    %% Default data analysis from RSI on the modified .P file
+    DISS_QL={};
+
     if run_quick_look
         fprintf(">>> Quick look at the data\n")
         % Pressure limits to show spectra with quick_look
         pmin_ql=param.info.pmin; % min pressure [dbar]
         pmax_ql=param.info.pmax; % max pressure [dbar]
         ql_info=quick_look; % Default parameters
+        ql_info.despike_A=param.info.despike_A;
+        ql_info.despike_sh=param.info.despike_sh;
+        ql_info.profile_min_P=param.info.pmin;
+        ql_info.profile_min_W=param.info.minvel_detect;
+        ql_info.profile_min_duration=param.info.mindur_detect;
+        % Other parameters related to fft are kept as default.
+        
+        if ~make_plot_prof
+            ql_info.make_figures=false; % No plot
+        end
+        
         for kprof=1:Nprf
-            fprintf(">>>>>> Profile %d/%d\n",kprof,Nprf)
+            fprintf(">>>>> Profile %d/%d\n",kprof,Nprf)
             ql_info.profile_num=kprof;
-            diss_prof(kprof)=quick_look([param.folder,param.filename_list{kf},'.P'],pmin_ql,pmax_ql,ql_info);
-            
-            figHandles = findobj('Type', 'figure');
-            folder_prof=[folder_out,'Prof_',num2str(kprof)];
-            if exist(folder_prof, 'dir')
-                rmdir(folder_prof,'s')
-            end
-            mkdir(folder_prof)
-            
-            for kfig=1:length(figHandles)
-                saveas(figHandles(kfig),[folder_prof,'\ql_prof',num2str(kprof),'_fig',num2str(kfig),'.fig'])
+            DISS_QL{kprof}=quick_look(modified_data_file,pmin_ql,pmax_ql,ql_info);
+            DISS_QL{kprof}.approx_bin_size =  DISS_QL{kprof}.diss_length * nanmean (DISS_QL{kprof}.speed);  % in m
+ 
+            if make_plot_prof
+                if ~exist([folder_out,'Figures'],'dir')
+                    mkdir([folder_out,'Figures'])
+                end
+                figHandles = findobj('Type', 'figure');
+                for kfig=1:length(figHandles)
+                    saveas(figHandles(kfig),[folder_out,'Figures\ql_prof',num2str(kprof),'_fig',num2str(kfig),'.fig'])
+                    exportgraphics(figHandles(kfig),[folder_out,'Figures\ql_prof',num2str(kprof),'_fig',num2str(kfig),'.png'],'Resolution',400)
+                end
             end
             close all
         end
-        DISS_QL{kf}=diss_prof;
-        save([folder_out,'quick_look_data.mat'],'DISS_QL')
 
-        clear pmin_ql pmax_ql diss_quick
+        
+        %save([folder_out,'quick_look_data.mat'],'DISS_QL')
+
+        clear pmin_ql pmax_ql diss_prof
     end
     
-    %% Calibration of the fast thermistors (data_prof is reloaded)
-
-    if calibrate_FP07
-        [data_prof,cfgfile_cal]=run_calibration_FP07(param,data_prof,param.CTD_T,ind_prof_slow,Nprf,modified_data_file,cfgfile_mod,make_plot_prof);
-    end
-
-    DATA(kf)=data_prof;
 
     %% Add variables to data_prof
     data_prof.tnum_slow=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_slow/86400;
@@ -165,7 +180,7 @@ for kf=1:length(param.filename_list)
 
         % Correct pressure with respect to the atmospheric pressure for the
         % given profile
-        [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot_prof);
+        [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,ind_prof_fast,kprof,make_plot_prof,folder_out);
 
 
         % Turbulence analysis
@@ -269,14 +284,17 @@ for kf=1:length(param.filename_list)
 
    
     % Saving the data:
-    % if ~isempty(inPall)
-    %     save([folder_main,'/microCTD_20200319_',filename,'_',info.prof_dir],'BINNED','SLOW','FAST')
-    % 
-    %     % Comparison epsilon and diffusivity from sh and T
-    %     plot_comparison(BINNED,[1:length(inPall)],[filename '_all'],folder_main,folder_out);close all;
-    % else
-    %     warning('No profile for %s: data not saved',filename0)
-    % end
+    if Nprf>0
+        BINNED=BINNED0;
+        SLOW=SLOW0;
+        FAST=FAST0;
+        clear BINNED0 SLOW0 FAST0
+        save([folder_out,'results_',param.filename_list{kf},'_',param.info.prof_dir,'.mat'],'BINNED','SLOW','FAST','DISS_QL')
+        % Comparison epsilon and diffusivity from sh and T
+        % plot_comparison(BINNED,[1:length(inPall)],[filename '_all'],folder_main,folder_out);close all;
+    else
+        warning('No profile for %s: data not saved',param.filename_list{kf})
+    end
         
 end
 
