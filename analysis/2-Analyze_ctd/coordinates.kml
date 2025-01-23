@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="1">
+        <Placemark id="3">
+            <name>TZ1</name>
+            <Point id="2">
+                <coordinates>8.497937892294157,47.09312483918678,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="5">
+            <name>TZ9</name>
+            <Point id="4">
+                <coordinates>8.481357424763873,47.125787004471015,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="7">
+            <name>TZ10</name>
+            <Point id="6">
+                <coordinates>8.484236199013463,47.12269333229681,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="9">
+            <name>TZ11</name>
+            <Point id="8">
+                <coordinates>8.486470606000474,47.12036109633347,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="11">
+            <name>TZ12</name>
+            <Point id="10">
+                <coordinates>8.489127151407073,47.11806094040629,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="13">
+            <name>TZ13</name>
+            <Point id="12">
+                <coordinates>8.493116651957582,47.1158744414409,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="15">
+            <name>TZ14</name>
+            <Point id="14">
+                <coordinates>8.494713090334834,47.11263032107584,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="17">
+            <name>TZ15</name>
+            <Point id="16">
+                <coordinates>8.495647277688569,47.109221346900654,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="19">
+            <name>TZ16</name>
+            <Point id="18">
+                <coordinates>8.496125939542686,47.1067701023592,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="21">
+            <name>TZ17</name>
+            <Point id="20">
+                <coordinates>8.496099425932355,47.1034239278114,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="23">
+            <name>TZ18</name>
+            <Point id="22">
+                <coordinates>8.49650807297348,47.10076641960523,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="25">
+            <name>TZ2</name>
+            <Point id="24">
+                <coordinates>8.485035791770667,47.1676732989898,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="27">
+            <name>TZ19</name>
+            <Point id="26">
+                <coordinates>8.496416039299254,47.09743883512853,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="29">
+            <name>TZ3</name>
+            <Point id="28">
+                <coordinates>8.484692215830567,47.164941759103385,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="31">
+            <name>TZ4</name>
+            <Point id="30">
+                <coordinates>8.484648103423645,47.16200959135597,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="33">
+            <name>TZ5</name>
+            <Point id="32">
+                <coordinates>8.485357514652133,47.15647083402857,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="35">
+            <name>TZ6</name>
+            <Point id="34">
+                <coordinates>8.487271895607607,47.14917593172788,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="37">
+            <name>TZ7</name>
+            <Point id="36">
+                <coordinates>8.48543981619183,47.13707547141581,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="39">
+            <name>TZ8</name>
+            <Point id="38">
+                <coordinates>8.484789244435264,47.132115780510276,0.0</coordinates>
+            </Point>
+        </Placemark>
+    </Document>
+</kml>
