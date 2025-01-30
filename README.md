@@ -24,7 +24,7 @@ control over your environment, please see [the documentation](https://renku.read
 ## Sensors
 ### VMP profiler
 
-<font color='red'>*Add details about the VMP here...*</font>
+<font color='red'>*Add details about the VMP here.*</font>
 
 ### CTD profiler
 
