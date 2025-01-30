@@ -356,7 +356,7 @@ if cont
         clf
         set(fh,'color','white','Units', 'Centimeters', 'Position', [0,0,16,8],...
             'PaperUnits', 'Centimeters', 'PaperSize', [16,8]);
-        ax1=axes('position',[0.08,0.175,0.2,0.72])
+        ax1=axes('position',[0.08,0.175,0.2,0.72]);
         plot(x0-mean(x0),pres,'k')
         axis ij
         grid('on')
