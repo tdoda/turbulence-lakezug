@@ -32,7 +32,7 @@ if nargin<8
 end
 
 if nargin<9
-    run_dissip=true;
+    run_dissip=True;
 end
 
 info=param.info;
@@ -600,49 +600,48 @@ for i = 1:n_pres %length(pres)
     end
 
     %% Shear spectral calculations
-    if  run_dissip
-        if strcmp(info.Nasmyth_spec,'EPFL')
-            if param.config.S1
-                if param.config.S2
-                    try
-                        % [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
-                        [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
-                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
-                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
-                        BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(visco*D^2))^(1/4);
-                        % Batchelor wavenumber determined from shear probe used
-                        % to calculate Xi_ST:
-                        if (BIN.flag_S1(i)==0 && BIN.flag_S2(i)==1)
-                            meanKBSH=BIN.kB_S1(i);
-                        elseif (BIN.flag_S1(i)==1 && BIN.flag_S2(i)==0)
-                            meanKBSH=BIN.kB_S2(i);
-                        else % if both accepted or both rejected (anyway I want to have a value)
-                            meanKBSH=mean([BIN.kB_S1(i), BIN.kB_S2(i)]); 
-                        end
-                    catch
-                        warning('Shear (S1,S2) spectral calculations did not work in this bin')
+    if 
+    if strcmp(info.Nasmyth_spec,'EPFL')
+        if param.config.S1
+            if param.config.S2
+                try
+                    % [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
+                    %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                    % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                    %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                    [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
+                    [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
+                        TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
+                    BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
+                    BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(visco*D^2))^(1/4);
+                    % Batchelor wavenumber determined from shear probe used
+                    % to calculate Xi_ST:
+                    if (BIN.flag_S1(i)==0 && BIN.flag_S2(i)==1)
+                        meanKBSH=BIN.kB_S1(i);
+                    elseif (BIN.flag_S1(i)==1 && BIN.flag_S2(i)==0)
+                        meanKBSH=BIN.kB_S2(i);
+                    else % if both accepted or both rejected (anyway I want to have a value)
+                        meanKBSH=mean([BIN.kB_S1(i), BIN.kB_S2(i)]); 
                     end
-                else
-                    try
-                        % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                            TKE_dis_spec(Pf(jp),sh1_hp(jp),AAxy(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
-                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
-                        meanKBSH=BIN.kB_S1(i); % Batchelor wavenumber determined from shear probe used to calculate Xi_ST
-                    catch
-                        warning('Shear (S1) spectral calculations did not work in this bin')
-                    end
+                catch
+                    warning('Shear (S1,S2) spectral calculations did not work in this bin')
+                end
+            else
+                try
+                    % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                    %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                    [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        TKE_dis_spec(Pf(jp),sh1_hp(jp),AAxy(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
+                    BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
+                    meanKBSH=BIN.kB_S1(i); % Batchelor wavenumber determined from shear probe used to calculate Xi_ST
+                catch
+                    warning('Shear (S1) spectral calculations did not work in this bin')
                 end
             end
-        else
-            error('Nasmyth_spec is not EPFL')
         end
+    else
+        error('Nasmyth_spec is not EPFL')
     end
 
     %% FP07 spectral calculations
@@ -650,132 +649,129 @@ for i = 1:n_pres %length(pres)
         meanKBSH=0;
     end
 
-    if  run_dissip
-        if param.config.T1
-            % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
-            %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-            try
-                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp));
-                BIN.eps_T1(i) = visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
-                BIN.epsT1max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
-            catch
-                warning('FP07-T1 spectral calculations did not work in this bin')
-            end
+    if param.config.T1
+        % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
+        %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+        try
+            [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
+                gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp));
+            BIN.eps_T1(i) = visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
+            BIN.epsT1max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
+        catch
+            warning('FP07-T1 spectral calculations did not work in this bin')
         end
-    
-        if param.config.T2
-            try
-                % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
-                %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
-                %
-                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp));
-    
-                BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
-                BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
-            catch
-                warning('FP07-T2 spectral calculations did not work in this bin')
-            end
+    end
+
+    if param.config.T2
+        try
+            % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
+            %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
+            %
+            [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
+                gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp));
+
+            BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
+            BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
+        catch
+            warning('FP07-T2 spectral calculations did not work in this bin')
         end
     end
 end
 
 %% Flagging of shear and FP07 data (spectral analysis)
-if run_dissip
-    BIN.flag_ST1=0*BIN.flag_T1;
-    if param.config.S2
-        idx=find( BIN.MAD_ST1>=2*BIN.MADc | (BIN.flag_S1==1 &  BIN.flag_S2==1) );
-    else
-        idx=find( BIN.MAD_ST1>=2*BIN.MADc | BIN.flag_S1==1 );
-    end
-    BIN.flag_ST1(idx)=1;
-    idx=find(isnan(BIN.Xi_ST1) & BIN.flag_ST1>=0);
-    BIN.flag_ST1(idx)=NaN;
-    
-    BIN.flag_ST2=0*BIN.flag_T2;
-    if param.config.S2
-        idx=find( BIN.MAD_ST2>=2*BIN.MADc | (BIN.flag_S1==1 &  BIN.flag_S2==1) );
-    else
-        idx=find( BIN.MAD_ST2>=2*BIN.MADc | BIN.flag_S1==1 );
-    end
-    BIN.flag_ST2(idx)=1;
-    idx=find(isnan(BIN.Xi_ST2) & BIN.flag_ST2>=0);
-    BIN.flag_ST2(idx)=NaN;
-    
-    % Create txt file if flag(s) exist(s)
-    flagvib = length(BIN.flag_vibration(BIN.flag_vibration==1));
-    flaginc = length(BIN.flag_inclination(BIN.flag_inclination==1));
-    flagacc = length(BIN.flag_acceleration(BIN.flag_acceleration==1));
-    flagsh1 = length(BIN.flag_S1(BIN.flag_S1==1));
-    flagT1 = length(BIN.flag_T1(BIN.flag_T1==1));
-    flagT2 = length(BIN.flag_T2(BIN.flag_T2==1));
-    flagST1 = length(BIN.flag_ST1(BIN.flag_T1==1));
-    flagST2 = length(BIN.flag_ST2(BIN.flag_T2==1));
-    flagsh2 = 0; %% Define it to be 0 if only sh1 is present, so no conflict below
-    if param.config.S2
-        flagsh2 = length(BIN.flag_S2(BIN.flag_S2==1));
-    end
-    if flagvib == 0 & flaginc == 0 & flagacc == 0 & flagT1 == 0 & flagT2 == 0 & flagsh1 == 0 & flagsh2 == 0 & flagST1 == 0 & flagST2 == 0
-        %no flags, do nothing
-    else
-        flagname = sprintf('flag_profile%.0f.txt', kprof);
-        fido = fopen(strcat(folder_out,flagname),'wt');
-        if flagvib > 0
-            fprintf(fido,'flagged due to excessive vibrations\n');
-        end
-        if flaginc > 0
-            fprintf(fido,'flagged due to excessive inclination\n');
-        end
-        if flagacc > 0
-            fprintf(fido,'flagged due to excessive acceleration of instrumet\n');
-        end
-        if flagsh1 > 0
-            fprintf(fido,'flagged for S1 fit\n');
-        end
-        if flagsh2 > 0
-            fprintf(fido,'flagged for S2 fit\n');
-        end
-        if flagT1 > 0
-            fprintf(fido,'flagged for T1 fit\n');
-        end
-        if flagT2 > 0
-            fprintf(fido,'flagged for T2 fit\n');
-        end
-        if flagST1 > 0
-            fprintf(fido,'flagged for ST1\n');
-        end
-        if flagST2 > 0
-            fprintf(fido,'flagged for ST2');
-        end
-        fclose(fido);
-    end
 
-    %% Additional variables: K-OsbornCox and Ozmidov length scale
-    BIN.KOsborn_S1 = 0.2*BIN.eps_S1.*(BIN.N2).^-1; % Gamma = 0.2
-    BIN.KOsborn_T1=0.2*BIN.eps_T1.*(BIN.N2).^-1;
-    BIN.KOsborn_T2=0.2*BIN.eps_T2.*(BIN.N2).^-1;
-    BIN.KOsbornCox_T1 = 0.5*BIN.Xi_T1.*(BIN.avggradT1).^-2;
-    BIN.KOsbornCox_T2 = 0.5*BIN.Xi_T2.*(BIN.avggradT2).^-2;
-    BIN.KOsbornCox_ST1 = 0.5*BIN.Xi_ST1.*(BIN.avggradT1).^-2;
-    BIN.KOsbornCox_ST2 = 0.5*BIN.Xi_ST2.*(BIN.avggradT2).^-2;
-    BIN.LO_S1 = (BIN.eps_S1./BIN.N2.^(3/2)).^(0.5);
-    if param.config.S2
-        BIN.LO_S2 = (BIN.eps_S2./BIN.N2.^(3/2)).^(0.5);
-        BIN.KOsborn_S2 = 0.2*BIN.eps_S2.*(BIN.N2).^-1; % Gamma = 0.2
+BIN.flag_ST1=0*BIN.flag_T1;
+if param.config.S2
+    idx=find( BIN.MAD_ST1>=2*BIN.MADc | (BIN.flag_S1==1 &  BIN.flag_S2==1) );
+else
+    idx=find( BIN.MAD_ST1>=2*BIN.MADc | BIN.flag_S1==1 );
+end
+BIN.flag_ST1(idx)=1;
+idx=find(isnan(BIN.Xi_ST1) & BIN.flag_ST1>=0);
+BIN.flag_ST1(idx)=NaN;
+
+BIN.flag_ST2=0*BIN.flag_T2;
+if param.config.S2
+    idx=find( BIN.MAD_ST2>=2*BIN.MADc | (BIN.flag_S1==1 &  BIN.flag_S2==1) );
+else
+    idx=find( BIN.MAD_ST2>=2*BIN.MADc | BIN.flag_S1==1 );
+end
+BIN.flag_ST2(idx)=1;
+idx=find(isnan(BIN.Xi_ST2) & BIN.flag_ST2>=0);
+BIN.flag_ST2(idx)=NaN;
+
+% Create txt file if flag(s) exist(s)
+flagvib = length(BIN.flag_vibration(BIN.flag_vibration==1));
+flaginc = length(BIN.flag_inclination(BIN.flag_inclination==1));
+flagacc = length(BIN.flag_acceleration(BIN.flag_acceleration==1));
+flagsh1 = length(BIN.flag_S1(BIN.flag_S1==1));
+flagT1 = length(BIN.flag_T1(BIN.flag_T1==1));
+flagT2 = length(BIN.flag_T2(BIN.flag_T2==1));
+flagST1 = length(BIN.flag_ST1(BIN.flag_T1==1));
+flagST2 = length(BIN.flag_ST2(BIN.flag_T2==1));
+flagsh2 = 0; %% Define it to be 0 if only sh1 is present, so no conflict below
+if param.config.S2
+    flagsh2 = length(BIN.flag_S2(BIN.flag_S2==1));
+end
+if flagvib == 0 & flaginc == 0 & flagacc == 0 & flagT1 == 0 & flagT2 == 0 & flagsh1 == 0 & flagsh2 == 0 & flagST1 == 0 & flagST2 == 0
+    %no flags, do nothing
+else
+    flagname = sprintf('flag_profile%.0f.txt', kprof);
+    fido = fopen(strcat(folder_out,flagname),'wt');
+    if flagvib > 0
+        fprintf(fido,'flagged due to excessive vibrations\n');
     end
+    if flaginc > 0
+        fprintf(fido,'flagged due to excessive inclination\n');
+    end
+    if flagacc > 0
+        fprintf(fido,'flagged due to excessive acceleration of instrumet\n');
+    end
+    if flagsh1 > 0
+        fprintf(fido,'flagged for S1 fit\n');
+    end
+    if flagsh2 > 0
+        fprintf(fido,'flagged for S2 fit\n');
+    end
+    if flagT1 > 0
+        fprintf(fido,'flagged for T1 fit\n');
+    end
+    if flagT2 > 0
+        fprintf(fido,'flagged for T2 fit\n');
+    end
+    if flagST1 > 0
+        fprintf(fido,'flagged for ST1\n');
+    end
+    if flagST2 > 0
+        fprintf(fido,'flagged for ST2');
+    end
+    fclose(fido);
+end
+
+%% Additional variables: K-OsbornCox and Ozmidov length scale
+BIN.KOsborn_S1 = 0.2*BIN.eps_S1.*(BIN.N2).^-1; % Gamma = 0.2
+BIN.KOsborn_T1=0.2*BIN.eps_T1.*(BIN.N2).^-1;
+BIN.KOsborn_T2=0.2*BIN.eps_T2.*(BIN.N2).^-1;
+BIN.KOsbornCox_T1 = 0.5*BIN.Xi_T1.*(BIN.avggradT1).^-2;
+BIN.KOsbornCox_T2 = 0.5*BIN.Xi_T2.*(BIN.avggradT2).^-2;
+BIN.KOsbornCox_ST1 = 0.5*BIN.Xi_ST1.*(BIN.avggradT1).^-2;
+BIN.KOsbornCox_ST2 = 0.5*BIN.Xi_ST2.*(BIN.avggradT2).^-2;
+BIN.LO_S1 = (BIN.eps_S1./BIN.N2.^(3/2)).^(0.5);
+if param.config.S2
+    BIN.LO_S2 = (BIN.eps_S2./BIN.N2.^(3/2)).^(0.5);
+    BIN.KOsborn_S2 = 0.2*BIN.eps_S2.*(BIN.N2).^-1; % Gamma = 0.2
+end
 
 
-    %% Plots bin profile
-    if make_plot_prof
-        plot_bin_profile(SLOW,BIN,param)
-    
-        if ~exist([folder_out,'Figures'],'dir')
-            mkdir([folder_out,'Figures'])
-        end
-        saveas(gcf,[folder_out,'Figures/results_',num2str(kprof,'%02d'),info.prof_dir,'.fig'])
-        exportgraphics(gcf,[folder_out,'Figures/results_',num2str(kprof,'%02d'),info.prof_dir,'.png'],'Resolution',400)
+%% Plots bin profile
+if make_plot_prof
+    plot_bin_profile(SLOW,BIN,param)
+
+    if ~exist([folder_out,'Figures'],'dir')
+        mkdir([folder_out,'Figures'])
     end
+    saveas(gcf,[folder_out,'Figures/results_',num2str(kprof,'%02d'),info.prof_dir,'.fig'])
+    exportgraphics(gcf,[folder_out,'Figures/results_',num2str(kprof,'%02d'),info.prof_dir,'.png'],'Resolution',400)
 end
 
 %% Add metadata

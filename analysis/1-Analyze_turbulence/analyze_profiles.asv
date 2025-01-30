@@ -183,10 +183,12 @@ for kf=1:length(param.filename_list)
 
 
         % Turbulence analysis
-        tic
-        [BINNED0{counter},SLOW0{counter}, FAST0{counter}] = ...
-            resolve_turbulence(data_prof,kprof,param,folder_out,counter,make_plot_prof,make_plot_spectra,run_dissip);
-        toc  
+        if run_dissip
+            tic
+            [BINNED0{counter},SLOW0{counter}, FAST0{counter}] = ...
+                resolve_turbulence(data_prof,kprof,param,folder_out,counter,make_plot_prof,make_plot_spectra);
+            toc  
+        end
 
         % ------------------------------------------------------------------
         % Additional script from Sebastiano:
