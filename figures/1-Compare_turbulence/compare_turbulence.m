@@ -10,7 +10,7 @@ savefig=false;
 campaign_name='20241205';
 datafolder=['..\..\data\VMP\',campaign_name,'\Level2\'];
 folder_param_name='down1.0_K5.3_L_NAS0.0058_singlepole_nfft3_EPFL_Goodman';
-filenames={'VMP001','VMP002','VMP003','VMP004'};
+filenames={'VMP010','VMP011'};
 
 addpath("..\..\functions\figures\") % Add functions
 
