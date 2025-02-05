@@ -25,6 +25,9 @@ if nargin<5
     JAC_correction=false;
 end
 
+Cond(Cond<0)=0; % Replace negative conductivity values by zero (T. Doda)
+Cond(~isfinite(Cond))=0; % Replace non finite conductivity values by zero (T. Doda)
+
 if strcmp(lakename,'default')
     [Sal,Cmatch]=salinity_JAC(Press,Temp,Cond);
     Cmatch=Cmatch*1000; % [uS/cm]
@@ -41,7 +44,7 @@ elseif strcmp(lakename,'Zug')
     % *********** NEED TO CHECK AND UPDATE THE ESTIMATES **************
     gS=0.79e-3; %  Coefficient converting conductivity at 20°C to salinity [g cm kg^-1 uS^-1]  (Boisgontier, 2016)
     
-    rho0 = 999.84298 + 1e-3*(65.4891*Temp - 8.56272*Temp.^2 + 0.059385*Temp.^3); %doesn't work for temperature higher than 25°C
+    rho0 = 999.84298 + 1e-3*(65.4891*Temp - 8.56272*Temp.^2 + 0.059385*Temp.^3); % [kg/m3], doesn't work for temperature higher than 25°C
     if JAC_correction
         [~,Cmatch] = salinity_JAC(Press,Temp,Cond);
         Cmatch=Cmatch*1000; % [uS/cm]
