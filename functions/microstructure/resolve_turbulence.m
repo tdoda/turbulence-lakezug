@@ -425,8 +425,8 @@ if make_plot_prof
     if ~exist([folder_out,'Figures'],'dir')
         mkdir([folder_out,'Figures'])
     end
-    saveas(gcf,[folder_out,'Figures/profile',num2str(kprof,'%02d'),'.fig'])
-    exportgraphics(gcf,[folder_out,'Figures/profile',num2str(kprof,'%02d'),'.png'],'Resolution',400)
+    saveas(gcf,[folder_out,'Figures/profile',num2str(kprof,'%02d'),'.fig']);
+    exportgraphics(gcf,[folder_out,'Figures/profile',num2str(kprof,'%02d'),'.png'],'Resolution',400);
 end
 
 %% Defines output variables in BIN structure
@@ -600,6 +600,7 @@ for i = 1:n_pres %length(pres)
     end
 
     %% Shear spectral calculations
+    close all % Close all the figures
     if  run_dissip
         if strcmp(info.Nasmyth_spec,'EPFL')
             if param.config.S1
@@ -622,7 +623,7 @@ for i = 1:n_pres %length(pres)
                         elseif (BIN.flag_S1(i)==1 && BIN.flag_S2(i)==0)
                             meanKBSH=BIN.kB_S2(i);
                         else % if both accepted or both rejected (anyway I want to have a value)
-                            meanKBSH=mean([BIN.kB_S1(i), BIN.kB_S2(i)]); 
+                            meanKBSH=mean([BIN.kB_S1(i), BIN.kB_S2(i)]);
                         end
                     catch
                         warning('Shear (S1,S2) spectral calculations did not work in this bin')
@@ -663,7 +664,7 @@ for i = 1:n_pres %length(pres)
                 warning('FP07-T1 spectral calculations did not work in this bin')
             end
         end
-    
+
         if param.config.T2
             try
                 % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
@@ -671,15 +672,32 @@ for i = 1:n_pres %length(pres)
                 %
                 [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
                     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp));
-    
+
                 BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
                 BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
                 warning('FP07-T2 spectral calculations did not work in this bin')
             end
         end
+
+        % Save all open figures
+        hfig = get(0, 'Children');
+        for kf=1:length(hfig)
+            path_spectra=[folder_out,'Figures/spectra_profile_',num2str(kprof,'%02d')];
+            if ~exist(path_spectra,"dir")
+                mkdir(path_spectra) % Create folder
+            end
+            % saveas(gcf,[path_spectra,'/bin',num2str(i),'_fig',num2str(kf),'.fig']);
+            exportgraphics(gcf,[path_spectra,'/bin',num2str(i),'_fig',num2str(kf),'.png'],'Resolution',400);
+
+
+        end
+
+
     end
 end
+
+
 
 %% Flagging of shear and FP07 data (spectral analysis)
 if run_dissip
@@ -692,7 +710,7 @@ if run_dissip
     BIN.flag_ST1(idx)=1;
     idx=find(isnan(BIN.Xi_ST1) & BIN.flag_ST1>=0);
     BIN.flag_ST1(idx)=NaN;
-    
+
     BIN.flag_ST2=0*BIN.flag_T2;
     if param.config.S2
         idx=find( BIN.MAD_ST2>=2*BIN.MADc | (BIN.flag_S1==1 &  BIN.flag_S2==1) );
@@ -702,7 +720,7 @@ if run_dissip
     BIN.flag_ST2(idx)=1;
     idx=find(isnan(BIN.Xi_ST2) & BIN.flag_ST2>=0);
     BIN.flag_ST2(idx)=NaN;
-    
+
     % Create txt file if flag(s) exist(s)
     flagvib = length(BIN.flag_vibration(BIN.flag_vibration==1));
     flaginc = length(BIN.flag_inclination(BIN.flag_inclination==1));
@@ -769,7 +787,7 @@ if run_dissip
     %% Plots bin profile
     if make_plot_prof
         plot_bin_profile(SLOW,BIN,param)
-    
+
         if ~exist([folder_out,'Figures'],'dir')
             mkdir([folder_out,'Figures'])
         end
