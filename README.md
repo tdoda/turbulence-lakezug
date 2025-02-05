@@ -6,20 +6,33 @@ This repository contains the data and scripts related to turbulence measurements
 
 Link to the remote repository: https://gitlab.renkulab.io/tomy.doda/turbulence-lakezug.git
 
-## Working with the project
+## Working with the project on the Renku platform (online)
 
 The simplest way to start your project is right from the Renku
 platform - just click on the `Sessions` tab and start a new session.
 This will start an interactive environment right in your browser.
 
+## Installation on a local repository 
+
 To work with the project anywhere outside the Renku platform,
 click the `Settings` tab where you will find the
 git repo URLs - use `git` to clone the project on whichever machine you want.
 
-Initially we install a very minimal set of packages to keep the images small.
-However, you can add python and conda packages in `requirements.txt` and
-`environment.yml` to your heart's content. If you need more fine-grained
-control over your environment, please see [the documentation](https://renku.readthedocs.io/en/stable/topic-guides/customizing-sessions.html).
+**You need to have [git](https://git-scm.com/downloads) and [git-lfs](https://git-lfs.github.com/) installed in order to successfully clone the repository.**
+
+- Clone the repository to your local machine using the command:
+
+<span style="color:red">REPLACE WITH LINK TO YOUR REPOSITORY</span>
+
+ `git clone 
+ 
+ Note that the repository will be copied to your current working directory.
+
+- Use Python 3 and install the requirements with:
+
+ `pip install -r requirements.txt`
+
+ The python version can be checked by running the command `python --version`. In case python is not installed or only an older version of it, it is recommend to install python through the anaconda distribution which can be downloaded [here](https://www.anaconda.com/products/individual). 
 
 ## Sensors
 ### VMP profiler
