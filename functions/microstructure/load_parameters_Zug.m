@@ -19,7 +19,7 @@ param.info.mindur_detect = 30; % Minimim duration of a profile [s]
 param.info.minvel_detect=0.1; % Minimum speed for profile detection [m/s]
 param.info.minKT = 1;
 param.info.fAA = 90; % ~90%*f_AA, where f_AA = 98 Hz
-param.info.Tmethod = 'B'; % Options: 'B'=Batchelor; 'K'=Kraichnan
+%param.info.Tmethod = 'B'; % Options: 'B'=Batchelor; 'K'=Kraichnan
 param.info.Tspec = 'K';% Options: 'B'=Batchelor; 'K'=Kraichnan
 param.info.q = 5.26; %3.7; %5.26; %5.26; %2; %1.5; %3.9; %%% q turbulent parameter
 param.info.num_fft = 3; % number of fft lengths (with 50% overlapping): typically 3 or 5

@@ -18,12 +18,13 @@ calibrate_FP07=true; % Calibrate FP07
 run_dissip=true; % Compute dissipation based on Bieito's and Sebastiano's script
 cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
 make_plot_prof = true; % Make profile-related plots.
-make_plot_spectra = true; % Make spectra plots (temperature and shear spectra).
+make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
 
 addpath(odas_folder)
 addpath("..\..\functions\microstructure\") % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
+param.filename_list={'VMP007','VMP008','VMP010','VMP011'};
 
 if ~isfield(param,'cfgfile') || strcmp(param.cfgfile,'')
     if exist('cfg_file','var')
@@ -295,6 +296,7 @@ for kf=1:length(param.filename_list)
             FAST={};
         end
         save([folder_out,'results_',param.filename_list{kf},'_',param.info.prof_dir,'.mat'],'BINNED','SLOW','FAST','DISS_QL')
+        disp('>>> Data saved!')
         % Comparison epsilon and diffusivity from sh and T
         % plot_comparison(BINNED,[1:length(inPall)],[filename '_all'],folder_main,folder_out);close all;
     else
