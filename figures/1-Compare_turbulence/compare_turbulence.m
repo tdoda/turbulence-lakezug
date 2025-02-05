@@ -7,10 +7,10 @@ clc
 %% Parameters
 
 savefig=false;
-campaign_name='20241204';
-datafolder=['..\..\data\',campaign_name,'\Level2\'];
+campaign_name='20241205';
+datafolder=['..\..\data\VMP\',campaign_name,'\Level2\'];
 folder_param_name='down1.0_K5.3_L_NAS0.0058_singlepole_nfft3_EPFL_Goodman';
-filenames={'VMP004','VMP006','VMP003'};
+filenames={'VMP001','VMP002','VMP003','VMP004'};
 
 addpath("..\..\functions\figures\") % Add functions
 
@@ -26,9 +26,9 @@ end
 
 
 %% Figures turbulence
-col_day1=winter(3);
-col_day1(3,:)=[0,0,0];
-[fig1,fig2]=plot_comparison_turbulence(DATA,filenames,'all',col_day1,{'PC1','PC2','PSB'});
+col_day1=winter(length(filenames));
+%col_day1(3,:)=[0,0,0];
+[fig1,fig2]=plot_comparison_turbulence(DATA,filenames,'longest',col_day1);
 
 if savefig
     saveas(fig1,['turbulence_profiles',filenames{:},'.fig'])
