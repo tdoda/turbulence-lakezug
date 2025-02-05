@@ -26,7 +26,8 @@ end
 
 for i=1:nn
     jj=find(pres0>=pres(i)-0.5*pint & pres0<=pres(i)+0.5*pint);
-    if length(jj)>10
+    %if length(jj)>10 && 
+    if sum(x(jj),'omitnan')>10 % At least 10 values are not NaN (T. Doda)
         x0=pres0(jj);
         y0=x(jj);
 
