@@ -69,18 +69,18 @@ if strcmp(param.info.prof_dir,'up')
     if isempty(istop)
         press_atm=0; % Assumes that pressure was already corrected with coef0?
     else
-        press_atm = data_prof.P_fast(ind_prof_fast_x(istop));   % correction
+        press_atm = data_prof.P_fast_raw(ind_prof_fast_x(istop));   % correction
     end
 
     % Correct pressure only for the specific profile
-    P_slow_corr = data_prof.P_slow-press_atm;
-    P_fast_corr = data_prof.P_fast-press_atm;
+    P_slow_corr = data_prof.P_slow_raw-press_atm;
+    P_fast_corr = data_prof.P_fast_raw-press_atm;
     ind_prof_fast_plot=ind_prof_fast_x;
     ind_prof_slow_plot=ind_prof_slow_x*data_prof.fs_fast/data_prof.fs_slow;
 else % Downward profile
-    press_atm=min(data_prof.P_slow); % Miminum pressure of the file = atmospheric pressure
-    P_slow_corr = data_prof.P_slow-press_atm;
-    P_fast_corr = data_prof.P_fast-press_atm;
+    press_atm=min(data_prof.P_slow_raw); % Miminum pressure of the file = atmospheric pressure
+    P_slow_corr = data_prof.P_slow_raw-press_atm;
+    P_fast_corr = data_prof.P_fast_raw-press_atm;
     irange=0.0; % [s], keep the first profiling index
     ind_prof_slow_x=ind_prof_slow(1,kprof)-round(irange*data_prof.fs_slow):ind_prof_slow(1,kprof)+round(irange*data_prof.fs_slow);
     ind_prof_fast_x=ind_prof_fast(1,kprof)-round(irange*data_prof.fs_fast):ind_prof_fast(1,kprof)+round(irange*data_prof.fs_fast);
@@ -89,12 +89,17 @@ else % Downward profile
     istop=[];
 end
 
+fprintf('>>>>> Atmospheric pressure: %0.3f dbar\n',press_atm)
 %% Re-load the profile with pmin=0 (this part was originally in resolve_profile_all)
 data_prof.ind_prof_slow = get_profile(P_slow_corr,data_prof.W_slow,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_slow);
 data_prof.ind_prof_fast  = get_profile(P_fast_corr,data_prof.W_fast,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
 [~,data_prof.Nprf] = size(ind_prof_slow); % Number of profiles
+
+if size(ind_prof_slow,2)~=data_prof.Nprf
+    error('Change in number of profiles!')
+end
 
 %% Save the corrected pressure only for the specific profile
 data_prof.P_slow=NaN(length(data_prof.P_slow),1);
