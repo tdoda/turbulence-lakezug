@@ -28,7 +28,7 @@ param.info.time_corr = 'NAS'; % Options: 'RSI'; 'KOC'= Kocsis (tau=tau0*W^{-0.5}
 param.info.time_res = 0.0058; %0.0035;  0.0058   %%% 0.0-> no time response correction. Used only if time_corr='KOC' or 'NAS'
 param.info.Nasmyth_spec = 'EPFL';% Options: 'ODAS'=default by RSI; 'EPFL'=Bieito's version
 param.info.noise_corr = 'Goodman'; % Options: none or 'Goodman'
-param.info.npoles = 'single';% Options: 'single' or 'double' -> single-pole or double-pole correction of FP07
+param.info.npoles = 'single';% Options: 'single' or 'double' -> single-pole or double-pole time response correction of FP07
 param.info.kmax_factor = 1/1.66;
 param.info.despike_sh  = [ 8  0.5 0.04]; % Parameters to remove spikes in shear data (see odas function "despike")
 param.info.despike_A = [8 0.5000 0.0400]; % Parameters to remove spikes in accelerometer data (see odas function "despike")
@@ -222,8 +222,7 @@ if strcmp(date,'20211110') % Oscar's campaign #1
 %**************************************************************************
 elseif strcmp(date,'20241204') 
     param.folder = [general_data_folder,'20241204\Level0\'];
-    % param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006','VMP008'}; % Several files can be listed here
-    param.filename_list={'VMP003'}; % Several files can be listed here
+    param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006','VMP008'}; % Several files can be listed here
 
     % Set P offset and sh probe sensitivity
     % param.offset_P=-0.33;

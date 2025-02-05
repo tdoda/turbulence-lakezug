@@ -11,20 +11,20 @@ instrument='VMP'; % Options: 'VMP' or 'microCTD'
 direction = 'down'; % Direction of the profile, options: 'up' and 'down'
 general_data_folder='..\..\data\VMP\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\';
-date_campaign="20241205"; % Should match the date in "load_parameters" function except if "default" is used
+date_campaign="20241204"; % Should match the date in "load_parameters" function except if "default" is used
 run_quick_look=true; % Apply quick_look function from Rockland (shear dissipation only)
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
 calibrate_FP07=true; % Calibrate FP07
 run_dissip=true; % Compute dissipation based on Bieito's and Sebastiano's script
 cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
 make_plot_prof = true; % Make profile-related plots.
-make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
+make_plot_spectra = true; % Make spectra plots (temperature and shear spectra).
 
 addpath(odas_folder)
 addpath("..\..\functions\microstructure\") % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
-param.filename_list={'VMP007','VMP008','VMP010','VMP011'};
+param.filename_list={'VMP002'};
 
 if ~isfield(param,'cfgfile') || strcmp(param.cfgfile,'')
     if exist('cfg_file','var')
