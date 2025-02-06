@@ -58,7 +58,14 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % SPECTRUM: structure array containing all information to plot the spectra
 % (added by T. Doda, 05.02.2025)
 
-%% if nargin<
+%% 
+if nargin<23
+    ksfact=0.04;
+end
+
+if nargin<24
+    Snfact=1.55;
+end
 %% Initialization
 Xiv = NaN; Xi_ST=NaN; Xi_T=NaN; kB=NaN; sXif = nan; sKBT = nan; 
 MAD_ST = NaN; MAD_T = NaN;MLKH=nan; LR = nan; kU = nan; 
@@ -160,8 +167,8 @@ H = H(1:ikn);
 Sn = Sn(1:ikn);
 
 %% Variance in the noise free part determined from the noise model
-ksfact=0.04; % Upper bound of the inertial-convective subrange, as in Steinbuck et al. (2009)
-Snfact=1.55; % Maximum acceptable signal to noise ratio 1.55, as in Goto et al. (2016)
+% ksfact=0.04; % Upper bound of the inertial-convective subrange, as in Steinbuck et al. (2009)
+% Snfact=1.55; % Maximum acceptable signal to noise ratio 1.55, as in Goto et al. (2016)
 
 
 iknM0 = find(PSD<Snfact*Sn | H<H_lim | k==max(k),1,'first'); % Upper wavenumber limit of the fitting range
@@ -370,7 +377,7 @@ if cont
     SPECTRUM.Sn0=Sn; % Noise spectrum corrected for time response (all wavenumbers)
     SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
 
-    % Snfact, H,
+    %  H,
     % H_lim, kP
 
 

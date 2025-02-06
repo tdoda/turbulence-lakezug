@@ -1,4 +1,4 @@
-function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot,ksfact, Snfact)
+function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T,SPECTRUM]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot,ksfact, Snfact)
 
 % GOAL
 % Estimate of TKE and temperature variance dissipation rates eps and Xi by 
@@ -56,7 +56,7 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % fit_flag_ST: acceptance flag of Xi_ST according to quality metrics: 0 rejected, 1 accepted
 % fit_flag_T: acceptance flag of eps_T and Xi_T according to quality metrics: 0 rejected, 1 accepted
 % SPECTRUM: structure array containing all information to plot the spectra
-% (added by T. Doda, 05.02.2025)
+% [added by T. Doda, 06.02.25]
 
 %% 
 if nargin<23
@@ -376,12 +376,9 @@ if cont
     SPECTRUM.Sm=Sm; % Exponential fitted PSD over k
     SPECTRUM.Sn0=Sn; % Noise spectrum corrected for time response (all wavenumbers)
     SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
+    SPECTRUM.H=H; % Time response correction parameters over k
+    SPECTRUM.H_lim=H_lim; % Maximal value of H
 
-    % Snfact, H,
-    % H_lim, kP
-
-
-    
     %% Plots
     if plt~=0         
         fh=figure;
