@@ -656,8 +656,8 @@ for i = 1:n_pres %length(pres)
             % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
             %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
             try
-                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp));
+                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i),BIN.SPECTRUMT(i)] =...
+                    gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),info.ksfact,info.Snfact);
                 BIN.eps_T1(i) = visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
                 BIN.epsT1max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
@@ -670,8 +670,8 @@ for i = 1:n_pres %length(pres)
                 % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
                 %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
                 %
-                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp));
+                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i),BIN.SPECTRUMT(i)] =...
+                    gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),info.ksfact,info.Snfact);
 
                 BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
                 BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
