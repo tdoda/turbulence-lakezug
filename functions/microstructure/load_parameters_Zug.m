@@ -32,6 +32,8 @@ param.info.npoles = 'single';% Options: 'single' or 'double' -> single-pole or d
 param.info.kmax_factor = 1/1.66;
 param.info.despike_sh  = [ 8  0.5 0.04]; % Parameters to remove spikes in shear data (see odas function "despike")
 param.info.despike_A = [8 0.5000 0.0400]; % Parameters to remove spikes in accelerometer data (see odas function "despike")
+param.info.ksfact=0.04; % Upper bound of the inertial-convective subrange, as in Steinbuck et al. (2009)
+param.info.Snfact=1.55; % Maximum acceptable signal to noise ratio 1.55, as in Goto et al. (2016)
 
 %% Campaign-specific values (can overwrite default values)
 if strcmp(lakename,"Zug")
