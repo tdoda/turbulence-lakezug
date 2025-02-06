@@ -1,4 +1,4 @@
-function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot)
+function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_T]=gradT_dis_spec(pres,x0,k1,fn,kB_S,W,sL,sOV,Tdis,q,tau_0,time_corr,npoles,int_range,D,visco,T_dT,T_string,setupstr,plt,presplot,Tplot,ksfact, Snfact)
 
 % GOAL
 % Estimate of TKE and temperature variance dissipation rates eps and Xi by 
@@ -26,10 +26,14 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % T_string (*): name of the FP07 channel 'T1_dT1' or 'T2_dT2'
 % setupstr (*): setupfilestr configuration file provided by ODAS libraries
 % plt: flag for making the figure (0 no figure, ~=0 make figure)
-% presplt: pressure vector for making the plot
-% Tplt: temperature vector for making the plot
+% presplot: pressure vector for making the plot
+% Tplot: temperature vector for making the plot
+% ksfact (optional, defaut: 0.04): upper bound of the inertial-convective
+% subrange, as in Steinbuck et al. (2009) [added by T. Doda]
+% Snfact (optional, default: 1.55): maximum acceptable signal to noise
+% ratio 1.55, as in Goto et al. (2016) [added by T. Doda]
 
-% (*) these entries are required for caluclating the noise spectrum according 
+% (*) these entries are required for calculating the noise spectrum according 
 % to the function profided by RSI in the ODAS libraries.
 % They are obtained reading the .p files with the ODAS libraries. If the
 % ODAS libraries are not accessible by the user, an alternative for
@@ -54,6 +58,14 @@ function [Xiv,Xi_ST,Xi_T,kB,eps_T,MAD_ST,MAD_T,MADc,LR,kL,kU,krange,kP,fit_flag_
 % SPECTRUM: structure array containing all information to plot the spectra
 % (added by T. Doda, 05.02.2025)
 
+%% 
+if nargin<23
+    ksfact=0.04;
+end
+
+if nargin<24
+    Snfact=1.55;
+end
 %% Initialization
 Xiv = NaN; Xi_ST=NaN; Xi_T=NaN; kB=NaN; sXif = nan; sKBT = nan; 
 MAD_ST = NaN; MAD_T = NaN;MLKH=nan; LR = nan; kU = nan; 
@@ -123,9 +135,9 @@ PSD = PSD./H; % Corrected spectrum
 noise_info=gradT_noise_odas;
 noise_info.gamma_RSI = 1;
 noise_info.E_n = 3e-9;
-Sn = gradT_noise_odas(T_dT, T_string, W, fr, setupstr,noise_info);
-Sn = Sn*W;
-Sn = Sn./H;
+Sn = gradT_noise_odas(T_dT, T_string, W, fr, setupstr,noise_info); % Noise spectrum [(K/m)^2/Hz].
+Sn = Sn*W; % [K^2/m]
+Sn = Sn./H; % Correction for time response
 Sn(1) = 0;
 
 % Alternatively, the noise can be computed as follows
@@ -155,8 +167,10 @@ H = H(1:ikn);
 Sn = Sn(1:ikn);
 
 %% Variance in the noise free part determined from the noise model
-ksfact=0.04; % Upper bound of the inertial-convective subrange, as in Steinbuck et al. (2009)
-Snfact=1.55; % Maximum acceptable signal to noise ratio 1.55, as in Goto et al. (2016)
+% ksfact=0.04; % Upper bound of the inertial-convective subrange, as in Steinbuck et al. (2009)
+% Snfact=1.55; % Maximum acceptable signal to noise ratio 1.55, as in Goto et al. (2016)
+
+
 iknM0 = find(PSD<Snfact*Sn | H<H_lim | k==max(k),1,'first'); % Upper wavenumber limit of the fitting range
 
 kS = ksfact*Pr^(-0.5)*kB_S; % Lower wavenumber limit according to Steinbuck et al. (2009)
@@ -353,13 +367,17 @@ if cont
     eps_T=visco*D^2*(2*pi()*kB)^4; % TKE dissipation rate
 
     %% Export spectra information (T. Doda, 05.02.2025)
-    SPECTRUM.k=k0; % All wavenumbers
-    SPECTRUM.kcalc=k; % Wavenumbers up to the maximum wavenumber specified from the antil-aliasing filter f_AA (fn)
-    SPECTRUM.PSD_raw=PSD_raw; % Initial spectrum
-    SPECTRUM.PSD_corr=PSD; % Spectruim corrected for time response
+    SPECTRUM.k0=k0; % All wavenumbers
+    SPECTRUM.k=k; % Wavenumbers up to the maximum wavenumber specified from the anti-aliasing filter f_AA (fn)
+    SPECTRUM.PSD_raw=PSD_raw; % Initial spectrum (all wavenumvers)
+    SPECTRUM.PSD_corr=PSD; % Spectrum corrected for time response over k
     SPECTRUM.ind_fit=ikfit; % Indices of wavenumbers used for fitting, from max([kS, kuK]) to upper wavenumber defined from signal-to-noise ratio
+    SPECTRUM.PSD_theo=Tspec(Tdis, Xi_T, kB,k0,D,q); % Theoretica spectrum (all wavenumbers)
+    SPECTRUM.Sm=Sm; % Exponential fitted PSD over k
+    SPECTRUM.Sn0=Sn; % Noise spectrum corrected for time response (all wavenumbers)
+    SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
 
-    % Tspec(Tdis, Xi_T, kB,k0,D,q), Sm, Sn, Sn0, kB, fn/W, Snfact, H,
+    % Snfact, H,
     % H_lim, kP
 
 
