@@ -437,6 +437,7 @@ BIN.DynVisco= nan(1,length(pres));
 BIN.KinVisco= nan(1,length(pres));
 
 BIN.speed = nan(1,length(pres));
+BIN.WW= nan(1,length(pres));
 BIN.maxgradT = nan(1,length(pres));
 BIN.eps_S1 = nan(1,length(pres));
 BIN.kB_S1 = nan(1,length(pres));
@@ -548,7 +549,7 @@ for i = 1:n_pres %length(pres)
     % Note that in the main script I removed the smoothing, however I
     % leave this definition to be safe.
     WW = mean( abs( (Pf(jp(end)) - Pf(jp(1)))/(timef(jp(end)) - timef(jp(1))) ) );
-
+    BIN.WW(i)=WW;
     %% acceleration, vibration and inclination flags
     % flagging for too much vibrations, flag if more than 5% of
     % vibration per bin is >200 or if standard deviation is >100
@@ -656,7 +657,7 @@ for i = 1:n_pres %length(pres)
             % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
             %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
             try
-                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i),BIN.SPECTRUMT(i)] =...
+                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),BIN.MADc(i),BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i),BIN.SPECTRUMT1(i)] =...
                     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),info.ksfact,info.Snfact);
                 BIN.eps_T1(i) = visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
                 BIN.epsT1max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
@@ -670,15 +671,19 @@ for i = 1:n_pres %length(pres)
                 % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
                 %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
                 %
-                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i),BIN.SPECTRUMT(i)] =...
+                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),MADc_val,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i),BIN.SPECTRUMT2(i)] =...
                     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),info.ksfact,info.Snfact);
-
+                if isnan(BIN.MADc(i))
+                    BIN.MADc(i)=MADc_val; % Use the threshold value from T2
+                end
                 BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
                 BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
                 warning('FP07-T2 spectral calculations did not work in this bin')
             end
         end
+
+        
 
         % Save all open figures
         hfig = get(0, 'Children');
@@ -769,6 +774,11 @@ if run_dissip
         fclose(fido);
     end
 
+    % Display flagging % data removed:
+    disp('************************************')
+    fprintf('Percentage of data kept: T1 = %0.2f%%, T2 = %0.2f%%, S1 = %0.2f%%, S2 = %0.2f%%\n', ...
+        flagT1/length(BIN.depth)*100,flagT2/length(BIN.depth)*100,flagsh1/length(BIN.depth)*100,flagsh2/length(BIN.depth)*100)
+     disp('************************************')
     %% Additional variables: K-OsbornCox and Ozmidov length scale
     BIN.KOsborn_S1 = 0.2*BIN.eps_S1.*(BIN.N2).^-1; % Gamma = 0.2
     BIN.KOsborn_T1=0.2*BIN.eps_T1.*(BIN.N2).^-1;
