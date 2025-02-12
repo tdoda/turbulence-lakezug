@@ -87,7 +87,7 @@ end
 %% Degrees of freedom and MAD threshold
 NsegM = 2 * floor(length(x(:,1))/sL)-1;
 dof = 1.9*NsegM; %according to ODAS 4.4
-MADc = sqrt(2/dof);
+MADc = sqrt(2/dof); 
 
 %% Compute raw spectrum PSDT
 scalar_info.fft_length      = sL;
@@ -355,7 +355,7 @@ if cont
     Sm = exp(polyval(pp, log(k)));
     LKHpol = -cost_MLE(PSD(ikfit), Sm(ikfit), dof, Sn(ikfit));    
     LR = MLKH - LKHpol;
-    LR = log10(exp(1))*LR;   % Likelihoo ratio, see eq. (16)
+    LR = log10(exp(1))*LR;   % Likelihood ratio, see eq. (16)
     kU=k(iknM0);
     krange = log10(k(iknM0)) - log10(k(ikL));
     fit_flag_T =0;
@@ -369,12 +369,13 @@ if cont
     %% Export spectra information (T. Doda, 05.02.2025)
     SPECTRUM.k0=k0; % All wavenumbers
     SPECTRUM.k=k; % Wavenumbers up to the maximum wavenumber specified from the anti-aliasing filter f_AA (fn)
-    SPECTRUM.PSD_raw=PSD_raw; % Initial spectrum (all wavenumvers)
-    SPECTRUM.PSD_corr=PSD; % Spectrum corrected for time response over k
+    SPECTRUM.PSD_raw=PSD_raw; % Initial spectrum (all wavenumbers)
+    SPECTRUM.PSD0=PSD0; % Spectrum corrected for time response (all wavenumbers)
+    SPECTRUM.PSD=PSD; % Spectrum corrected for time response over k
     SPECTRUM.ind_fit=ikfit; % Indices of wavenumbers used for fitting, from max([kS, kuK]) to upper wavenumber defined from signal-to-noise ratio
     SPECTRUM.PSD_theo=Tspec(Tdis, Xi_T, kB,k0,D,q); % Theoretica spectrum (all wavenumbers)
     SPECTRUM.Sm=Sm; % Exponential fitted PSD over k
-    SPECTRUM.Sn0=Sn; % Noise spectrum corrected for time response (all wavenumbers)
+    SPECTRUM.Sn0=Sn0; % Noise spectrum corrected for time response (all wavenumbers)
     SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
     SPECTRUM.H=H; % Time response correction parameters over k
     SPECTRUM.H_lim=H_lim; % Maximal value of H
