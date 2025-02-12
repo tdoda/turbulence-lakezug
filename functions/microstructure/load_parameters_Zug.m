@@ -256,6 +256,21 @@ elseif strcmp(date,'20241205')
     param.config.uC1=true;
     param.config.uC2=true;
 %**************************************************************************
+elseif strcmp(date,'20250211') 
+    param.folder = [general_data_folder,'20250211\Level0\'];
+    param.filename_list={'VMP003','VMP004','VMP007','VMP008'}; % Several files can be listed here
+
+    % Set P offset and sh probe sensitivity
+    % param.offset_P=-0.33;
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_old';
+
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=true;
+    param.config.uC1=false;
+    param.config.uC2=false;
 else
     error("Invalid campaign date")
 end
