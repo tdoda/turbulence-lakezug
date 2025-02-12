@@ -53,7 +53,7 @@ fig_CTD=figure('Units','centimeters','Position',[1 1 14 18]);
 dy=0; % To reduce height of plots
 nrow=2; ncol=3;
 
-ax1=subplot(nrow,ncol,1); % Eps-T1
+ax1=subplot(nrow,ncol,1); % Temperature
 hp=plot_prof_slow(DATA,filenames_all,filenames,col,select_profile,'temperature',1);
 ylabel('Depth [m]')
 xlabel('CTD-T [°C]')
