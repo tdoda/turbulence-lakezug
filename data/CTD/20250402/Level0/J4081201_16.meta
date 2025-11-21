@@ -1,0 +1,33 @@
+{
+  "filename": "J4081201_16.TOB",
+  "valid": true,
+  "campaign": {
+    "Campaign Name": "Lake_zug_transect",
+    "Project Name": "IBEX",
+    "Device": "Sea&Sun CTD (1807)",
+    "Serial No": "1807",
+    "Person in charge": "Damien Bouffard",
+    "Other people involved": "Jemima Rama ",
+    "Date of measurement": "2025-04-02",
+    "Time Zone device (UTC+)": "0",
+    "Time Zone local (UTC+)": "2",
+    "Lake": "Lake Zug",
+    "Coordinate System": "CH1903 (Swiss Grid)",
+    "Altitude (m)": "413",
+    "General comment": "Sunny, calm "
+  },
+  "profile": {
+    "Profile name": "p6a",
+    "Time of measurement (local)": "13:32",
+    "X Coordinate (CH1903)": "680252",
+    "Y Coordinate (CH1903)": "218976",
+    "Start pressure (dbar)": "-0.3224",
+    "End pressure (dbar)": "63.0701",
+    "Something broke": false,
+    "Something got lost": false,
+    "Something is strange": false,
+    "Battery is empty": false,
+    "Battery was replaced": false,
+    "Other comment": "Total depth: 80m "
+  }
+}
