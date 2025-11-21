@@ -1,0 +1,6 @@
+Filename;Coordinates;Coordinate Grid;comments
+VMP001;680097/216973;CH1903/LV03;crashed into ground
+VMP002;680154/217144;CH1903/LV03;none
+VMP003;680141/217140;CH1903/LV03;none
+VMP004;;;canceled
+VMP005;680131/217124;CH1903/LV03;none
