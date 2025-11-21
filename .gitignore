@@ -342,3 +342,4 @@ tags
 *.P
 *.mat
 data/**/*.fig
+data/**/*.png
