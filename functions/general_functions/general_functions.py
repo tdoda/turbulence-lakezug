@@ -283,8 +283,9 @@ def export_netCDF(filename,general_attributes,dimensions,variables,data):
     filename (string): netCDF filename with path included
     general_attributes (dictionary): file attributes with the format {"name_attribute1": "attribute1_value",…}
     dimensions (dictionary): dimensions with the format {'name_dimension1': {'dim_name': 'name_dimension1', 'dim_size': ...},…}
-    variables (dictionary): variable names with the format {'name_variable1': {'var_name': 'name_variable1', 'dim': ('name_dim1',’name_dim2’,…),'unit': “name_units”, 'longname': 'long_name_variable1'},…}
+    variables (dictionary): variable names with the format {'name_variable1': {'var_name': 'name_variable1', 'dim': ('name_dim1',’name_dim2’,…),'unit': “name_units”, 'longname': 'long_name_variable1', 'var_type':'float' or 'str'},…}
     data (dictionary): data to export with the format {“name_variable1”:numpy_array,…}
+    vartype 
     
         
     Outputs: None
@@ -298,13 +299,27 @@ def export_netCDF(filename,general_attributes,dimensions,variables,data):
         setattr(nc_file, key, general_attributes[key])
         
     for key, values in dimensions.items():
-     	nc_file.createDimension(values['dim_name'], values['dim_size'])
+         nc_file.createDimension(values['dim_name'], values['dim_size'])
+
 
     for key, values in variables.items(): 
-        var = nc_file.createVariable(values["var_name"], np.float64, values["dim"], fill_value=np.nan)
+        if 'var_type' not in values.keys() or values["var_type"]=="float":
+            var = nc_file.createVariable(values["var_name"], np.float64, values["dim"], fill_value=np.nan)
+        elif values["var_type"]=="str":
+            var = nc_file.createVariable(values["var_name"], str, values["dim"])
+        else:
+            raise Exception("Variable type is unknown")
+        
         var.units = values["unit"]
         var.long_name = values["longname"]
-        var[:] = data[key]
+        if key in data.keys():
+            if 'var_type' not in values.keys() or values["var_type"]=="float":
+                var[:] = data[key]
+            else:
+                for k in range(len(data[key])):
+                    var[k]=data[key][k]
+        else:
+            raise Exception("Data is missing for {}".format(key))
     nc_file.close()
     print("Data exported to netCDF!")
     
@@ -437,4 +452,132 @@ def close_netCDF(nc_file,pathname,rootpath=r'C:/Users/tdoda'):
     
     # Delete file
     os.remove(current_path)
+
+def netCDF2dict(nc):
+    """Function netCDF2dict
+
+    Converts a netCDF object to a dictionary
+    
+    """
+    
+    nc_data=dict()
+    nc_genatt=dict()
+    nc_varatt=dict()
+    
+    for key,value in nc.variables.items():
+        if value.dtype==np.float64:
+            nc_data[key]=value[:].data
+        else:
+            nc_data[key]=value[:]
+        nc_varatt[key]=dict()
+        for att in value.ncattrs():
+            nc_varatt[key][att]=getattr(value,att)
+
+    for att in nc.ncattrs():
+        nc_genatt[att]=getattr(nc,att)
+
+                
+    return nc_data, nc_genatt, nc_varatt
+
+def dist_transect(xpt,ypt,xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',method='projected'):
+    """Function dist_transect
+
+    Computes distance along transect
+    
+    method='projected' on transect or 'sum' of final distance
+    
+    """
+
+    if (np.sum(~np.isnan(xtrans))==0) | (np.sum(~np.isnan(ytrans))==0): # Use default points
+        xtrans=np.array([679815.,679803., 679803., 679663., 679415., 679505., 680030., 680150.,
+               680223., 680409., 680814., 681350., 681909.])
+        ytrans=np.array([225711.,224100., 222690., 221650., 220433., 219544., 218872., 218462.,
+               218126., 217437., 216239., 214957., 213760.])
+    
+    dist_trans=np.concatenate((np.array([0]),np.sqrt(np.diff(xtrans)**2+np.diff(ytrans)**2)))
+    
+    if monotonic_dir=='y':
+        transcoord=ytrans
+        ptcoord=ypt
+    else:  # x
+        transcoord=xtrans
+        ptcoord=xpt
+    
+    if transcoord[1]>transcoord[0]: # ascending order
+        ind_point=np.where(transcoord<=ptcoord)[0]
+    elif transcoord[1]<transcoord[0]: # descending order
+        ind_point=np.where(transcoord>=ptcoord)[0]
+    else:
+        raise Exception("Transect coordinates should be monotonous in the selected direction")
+        
+    if np.size(ind_point)==0 or (len(ind_point)==len(transcoord) and transcoord[-1]!=ptcoord): 
+        raise Exception("Point outside of the transect")
+    if len(ind_point)<len(transcoord):
+        if method=='projected':
+            dist_pt=np.cumsum(dist_trans)[ind_point[-1]]+(ptcoord-transcoord[ind_point[-1]])/(transcoord[ind_point[-1]+1]-transcoord[ind_point[-1]])*dist_trans[ind_point[-1]+1]
+        elif method=='sum':
+            dist_pt=np.cumsum(dist_trans)[ind_point[-1]]+np.sqrt((xpt-xtrans[ind_point[-1]])**2+(ypt-ytrans[ind_point[-1]])**2)
+        return dist_pt
+    else:
+        return np.sum(dist_trans)
+    
+    
+def bathy_transect(x,y,D,xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',dx=1):
+    """Function bathy_transect
+
+    Extract bathymetry along transect
+    
+    """
+    if D.shape[0]!=len(y) or D.shape[1]!=len(x):
+        raise Exception("Wrong dimensions")
+
+    if (np.sum(~np.isnan(xtrans))==0) | (np.sum(~np.isnan(ytrans))==0): # Use default points
+        xtrans=np.array([679815.,679803., 679803., 679663., 679415., 679505., 680030., 680150.,
+               680223., 680409., 680814., 681350., 681909.])
+        ytrans=np.array([225711.,224100., 222690., 221650., 220433., 219544., 218872., 218462.,
+               218126., 217437., 216239., 214957., 213760.])
+    
+    if monotonic_dir=='y': 
+        ybathy=np.arange(np.min(ytrans),np.max(ytrans),dx)
+        ind_sort=np.argsort(ytrans)
+        xbathy=np.interp(ybathy,ytrans[ind_sort],xtrans[ind_sort],left=np.nan,right=np.nan)
+    else:  # x
+        xbathy=np.arange(np.min(xtrans),np.max(xtrans),dx)
+        ind_sort=np.argsort(xtrans)
+        ybathy=np.interp(xbathy,xtrans[ind_sort],ytrans[ind_sort],left=np.nan,right=np.nan)
+        
+    dist_bathy=np.full(xbathy.shape,np.nan)
+    depth_bathy=np.full(xbathy.shape,np.nan)
+    for k in range(len(dist_bathy)):
+        dist_bathy[k]=dist_transect(xbathy[k],ybathy[k],xtrans=xtrans,ytrans=ytrans,monotonic_dir=monotonic_dir,method="projected")
+        try:
+            depth_bathy[k]=D[np.where(y>=ybathy[k])[0][0],np.where(x>=xbathy[k])[0][0]]
+        except:
+            breakpoint()
+    
+    ind_sort_dist=np.argsort(dist_bathy)
+    xbathy=xbathy[ind_sort_dist]
+    ybathy=ybathy[ind_sort_dist]
+    dist_bathy=dist_bathy[ind_sort_dist]
+    depth_bathy=depth_bathy[ind_sort_dist]
+    
+    
+    return xbathy,ybathy,dist_bathy,depth_bathy
+
+
+def matstruct2dict(mat_struct):
+    """Function matstruct2dict
+
+    Converts Matlab structures into dictionary
+    
+    """
+    key_names=list(dir(mat_struct))
+    D=dict()
+    for key in key_names:
+        if key[0]!="_":
+            D[key]=getattr(mat_struct,key)
+
+    return D
+    
+
 
