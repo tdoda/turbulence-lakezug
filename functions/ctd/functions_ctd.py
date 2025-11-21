@@ -6,6 +6,7 @@ import dateparser
 import numpy as np
 import pandas as pd
 import seawater as sw
+import netCDF4 as nc
 from copy import deepcopy
 from pyrsktools import RSK
 import matplotlib.pyplot as plt
@@ -449,3 +450,186 @@ def position_in_array(arr, value):
         if value < arr[i]:
             return i
     return len(arr)
+
+def thorpe_scale(depth,q,stability_type,res=0):
+    """
+    Calculates Thorpe displacements and Thorpe scale, based on https://github.com/modscripps/mixsea/tree/main
+    
+    Parameters
+    ----------
+    depth : array-like
+            Depth [m] (positive, monotically increasing)
+    q : array-like
+            Quantity from which Thorpe scales will be computed, e.g. density or temperature. 
+    stability_type: string
+            Type of stability, either "increasing" or "decreasing" with depth
+
+    Returns
+    -------
+    Lt : ndarray
+            Thorpe scale [m]
+    thorpe_disp : ndarray
+            Thorpe displacement [m]
+    q_sorted : ndarray
+            q sorted to be monotonically increasing
+    ends_flag : ndarray
+            True if a patch includes and end point
+    idx_patches : ndarray
+            Indices of overturning patches, e.g. idx_patches[:, 0] are start indices and idx_patches[:, 1] are end indices (both indices are included in the patch). 
+    idx_sorted : ndarray
+            Indices required to sort q so as to generate q_sorted.
+    res: float
+        Resolution below which data is rounded (no overturn detection)
+            
+    Other possible returned variables:
+        
+    noise_flag : ndarray
+            True if difference in q from top to bottom patch is less than dnoise
+            
+    Ro : ndarray
+            Overturn ratio of Gargett & Garner.
+    """
+    if stability_type=="decreasing":
+        q=-q
+    
+
+    if q[0] > q[-1]:
+        raise ValueError("The entire profile is unstable, q[0] > q[-1].")
+
+    if not np.all(np.isclose(np.maximum.accumulate(depth), depth)):
+        raise ValueError(
+            "It appears that depth is not monotonically increasing, please fix."
+        )
+    
+    if res!=0:
+        q_rounded=np.round(q/res)*res
+    else:
+        q_rounded=np.copy(q)
+    idx_sorted, idx_patches = find_overturns(q_rounded)
+
+    ndata = depth.size
+
+    # Thorpe displacements
+    # = defined here as the distance from current depth where the sorted value is located (i.e., depth where value should be moved to the current depth to get a sort profile is current depth + thorpe displacement)
+    # e.g., if displacement=-2, we need to get the value 2 m above the current depth to sort the profile
+    # Thorpe displacements can also be defined as depth-depth[idx_sorted] (opposite signs)
+    thorpe_disp = depth[idx_sorted] - depth
+
+    q_sorted = q[idx_sorted]
+
+    # Initialise arrays.
+    Lt = np.full_like(depth, np.nan,dtype=np.float64)
+    Ro = np.full_like(depth, np.nan,dtype=np.float64)
+    noise_flag = np.full_like(depth, False, dtype=bool)
+    ends_flag = np.full_like(depth, False, dtype=bool)
+
+    dz = 0.5 * (depth[2:] - depth[:-2])  # 'width' of each data point
+    dz = np.hstack((dz[0], dz, dz[-1]))  # assume width of first and last data point
+
+    for patch in idx_patches:
+        # Get patch indices.
+        i0 = patch[0]
+        i1 = patch[1]
+        pidx = np.arange(i0, i1 + 1, 1)  # Need +1 for Python indexing
+
+        # Thorpe scale is the root mean square thorpe displacement.
+        Lto = np.sqrt(np.mean(np.square(thorpe_disp[pidx])))
+        Lt[pidx] = Lto
+
+        # Flag beginning or end.
+        if i0 == 0:
+            ends_flag[pidx] = True
+        if i1 == ndata - 1:
+            ends_flag[pidx] = True
+
+        # Flag small difference.
+        # dq = q_sorted[i1] - q_sorted[i0]
+        # if dq < dnoise:
+        #     noise_flag[pidx] = True
+
+        # Overturn ratio of Gargett & Garner
+        # Tdo = thorpe_disp[pidx]
+        # dzo = dz[pidx]
+        # L_tot = np.sum(dzo)
+        # L_neg = np.sum(dzo[Tdo < 0])
+        # L_pos = np.sum(dzo[Tdo > 0])
+        # Roo = np.minimum(L_neg / L_tot, L_pos / L_tot)
+        # Ro[pidx] = Roo
+        
+    if stability_type=="decreasing":
+        q_sorted=-q_sorted
+    # return Lt, thorpe_disp, q_sorted, noise_flag, ends_flag, Ro, idx_patches, idx_sorted
+    return Lt, thorpe_disp, q_sorted, ends_flag, idx_patches, idx_sorted
+
+
+def find_overturns(q):
+    """Find the indices of unstable patches by cumulatively summing the difference between
+    sorted and unsorted indices of q.
+
+    Parameters
+    ----------
+    q : array_like 1D
+            Profile of some quantity from which overturns can be detected
+            e.g. temperature or density.
+
+    Returns
+    -------
+    idx_sorted : 1D ndarray
+            Indices that sort the data q.
+    idx_patches : (N, 2) ndarray
+            Start and end indices of the overturns.
+
+    """
+    idx = np.arange(len(q), dtype=int) # Increasing indices
+    idx_sorted = np.argsort(q, kind="mergesort") # Indices of the sorted q
+    idx_cumulative = np.cumsum(idx_sorted - idx) # If the difference is non zero, presence of an overturn (not only unstable part of the profile)
+    idx_patches = contiguous_regions(idx_cumulative > 0)
+    return idx_sorted, idx_patches
+
+
+def contiguous_regions(condition):
+    """Finds the indices of contiguous True regions in a boolean array.
+
+    Parameters
+    ----------
+    condition : array_like
+            Array of boolean values.
+
+    Returns
+    -------
+    idx : ndarray
+            Array of indices demarking the start and end of contiguous True regions in condition.
+            Shape is (N, 2) where N is the number of regions.
+
+    Notes
+    -----
+    Modified from stack overflow: https://stackoverflow.com/a/4495197
+
+    """
+
+    d = np.diff(condition)
+    (idx,) = d.nonzero()
+
+    # We need to start things after the change in "condition". Therefore,
+    # we'll shift the index by 1 to the right.
+    idx += 1
+
+    if condition[0]:
+        # If the start of condition is True prepend a 0
+        idx = np.r_[0, idx]
+
+    if condition[-1]:
+        # If the end of condition is True, append the length of the array
+        idx = np.r_[idx, condition.size]  # Edit
+
+    # Reshape the result into two columns
+    idx.shape = (-1, 2)
+    return idx
+
+
+    
+    
+
+
+
+        

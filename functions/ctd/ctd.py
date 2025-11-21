@@ -305,7 +305,8 @@ class CTD:
             if "_qual" not in var:
                 idx = data[var + "_qual"] > 0
                 data[var][idx] = np.nan
-        data["adj_press"] = data["Press"] - self.air_pressure
+        breakpoint()
+        data["adj_press"] = data["Press"] - self.air_pressure # Atmospheric pressure is computed from measurements in the air in function extract_single_profile
         threshold = data["Temp"].shape[0] * 0.9
         if sum(np.isnan(data["Temp"])) > threshold or sum(np.isnan(data["Cond"])) > threshold or \
                 sum(np.isnan(data["adj_press"])) > threshold:
