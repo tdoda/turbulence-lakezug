@@ -3,3 +3,4 @@
 *.P filter=lfs diff=lfs merge=lfs -text
 *.fig filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+data/**/*.png !text !filter !merge !diff

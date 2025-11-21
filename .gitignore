@@ -338,5 +338,6 @@ tags
 .renku/cache
 
 # Large data files
-.p
-.mat
+*.p
+*.P
+*.mat
