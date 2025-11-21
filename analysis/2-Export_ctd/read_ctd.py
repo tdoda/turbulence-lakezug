@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 #%% Specify field campaign here:
 
-date_campaign='20250115'
+date_campaign='20250402'
 
 #%% Other parameters
 
@@ -52,10 +52,13 @@ for file in files:
             ctd = CTD(logger)
             if ctd.read_profile(profile):
                 ctd.quality_assurance(r'..\..\functions\ctd\quality_assurance_ctd.json')
-                ctd.derive_variables()
                 lake = ctd.get_lake()
                 file_name = os.path.basename(file["path"]).rsplit('.', 1)[0]
-                ctd.export(os.path.join(input_folder, "Level1"), "L1_CTD_{}_{}".format(file["type"], file_name))
+                ctd.export(os.path.join(input_folder, "Level1"), "L1_CTD_{}_{}".format(file["type"], file_name),overwrite=True)
+                ctd.mask_data() # Replace flagged data by nan 
+                ctd.derive_variables() # Compute additional variables to add to Level 2
+                ctd.export(os.path.join(input_folder, "Level2"), "L2_CTD_{}_{}".format(file["type"], file_name), overwrite=True) # Create Level 2 file      
+                
         else:
             logger.info("No metadata for profile {}".format(profile["name"]))
             metadata_required.append(profile)
