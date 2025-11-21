@@ -341,4 +341,4 @@ tags
 *.p
 *.P
 *.mat
-data/*/*.fig
+data/**/*.fig
