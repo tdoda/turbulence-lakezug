@@ -1,4 +1,0 @@
-flagged for T1 fit
-flagged for T2 fit
-flagged for ST1
-flagged for ST2
