@@ -336,3 +336,7 @@ tags
 .renku.lock
 .renku/tmp
 .renku/cache
+
+# Large data files
+.p
+.mat
