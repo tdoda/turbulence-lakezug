@@ -258,12 +258,12 @@ elseif strcmp(date,'20241205')
 %**************************************************************************
 elseif strcmp(date,'20250211') 
     param.folder = [general_data_folder,'20250211\Level0\'];
-    param.filename_list={'VMP003','VMP004','VMP007','VMP008'}; % Several files can be listed here
+    param.filename_list={'VMP003','VMP004','VMP007','VMP008','VMP009','VMP010','VMP012','VMP013','VMP014'}; % Several files can be listed here
 
     % Set P offset and sh probe sensitivity
     % param.offset_P=-0.33;
     % Use shear sensitivities specified in config file: 
-    param.cfgfile = 'setup_EAWAG_Zug_old';
+    param.cfgfile = 'setup_EAWAG_Zug_2025_02_11';
 
     param.config.T1=true;
     param.config.T2=true;
