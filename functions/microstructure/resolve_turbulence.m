@@ -1,4 +1,4 @@
-function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,profID,make_plot_prof,make_plot_spectra,run_dissip)
+function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,profID,make_plot_prof,ind_plot_spectra,run_dissip)
 %RESOLVE_TURBULENCE Compute turbulence estimates for a given profile based on the function
 %"resolve_microCTD_profile_all".
 %
@@ -10,8 +10,8 @@ function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,prof
 %   profID (int): profile counter.
 %   make_plot_prof (boolean) [optional]: = True to make profiles plots. Default value:
 %   False.
-%   make_plot_spectra (boolean) [optional]: = True to make spectra plots. Default value:
-%   False.
+%   ind_plot_spectra (int array) [optional]: indices of bins to make spectrum plot. Default value:
+%   0.
 %   run_dissip (boolean) [optional]: = True if turbulence analysis should
 %   be done. Default value: True.
 %
@@ -28,7 +28,7 @@ if nargin<7
 end
 
 if nargin<8
-    make_plot_spectra=false;
+    ind_plot_spectra=0;
 end
 
 if nargin<9
@@ -602,6 +602,11 @@ for i = 1:n_pres %length(pres)
 
     %% Shear spectral calculations
     close all % Close all the figures
+    if ismember(i,ind_plot_spectra)
+        make_plot_spectra=true;
+    else
+        make_plot_spectra=false;
+    end
     if  run_dissip
         if strcmp(info.Nasmyth_spec,'EPFL')
             if param.config.S1
@@ -693,7 +698,7 @@ for i = 1:n_pres %length(pres)
                 mkdir(path_spectra) % Create folder
             end
             % saveas(gcf,[path_spectra,'/bin',num2str(i),'_fig',num2str(kf),'.fig']);
-            exportgraphics(gcf,[path_spectra,'/bin',num2str(i),'_fig',num2str(kf),'.png'],'Resolution',400);
+            exportgraphics(gcf,[path_spectra,'/bin',num2str(i),'_press',num2str(BIN.pressure(i)),'_fig',num2str(kf),'.png'],'Resolution',400);
 
 
         end

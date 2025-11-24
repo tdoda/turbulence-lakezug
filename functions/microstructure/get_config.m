@@ -77,7 +77,7 @@ if modify_cfg
 
     %% Reconvert to physical units
     default_parameters=odas_p2mat;
-    data_prof=odas_p2mat(modified_data_file,default_parameters);
+    data_prof=odas_p2mat_print(modified_data_file,false,default_parameters); % Do not print results (TD, 20251124)
     data_prof.tnum_slow=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_slow/86400;
     data_prof.tdate_slow=datetime(data_prof.tnum_slow,'ConvertFrom','datenum');
     data_prof.tnum_fast=datenum([data_prof.date,' ',data_prof.time],'yyyy-mm-dd HH:MM:SS.FFF')+data_prof.t_fast/86400;

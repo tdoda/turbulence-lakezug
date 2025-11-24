@@ -56,7 +56,7 @@ patch_setupstr(modified_data_file,cfgfile_cal); % patch the new cfg file
 %% Re-convert the data to physical units
 clear data_prof
 default_parameters=odas_p2mat;
-data_prof = odas_p2mat(modified_data_file,default_parameters);          % re-convert data to physical units
+data_prof = odas_p2mat_print(modified_data_file,false,default_parameters);          % re-convert data to physical units, do not print results (TD, 20251124)
 if ~strcmp(data_prof.input_parameters.gradT_method,'high_pass')
     error('Error: the gradT_method should be high_pass (if first_difference, pass the info to get_scalar_spectra_odas)')
 end

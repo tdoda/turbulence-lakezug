@@ -12,20 +12,20 @@ instrument='VMP'; % Options: 'VMP' or 'microCTD'
 direction = 'down'; % Direction of the profile, options: 'up' and 'down'
 general_data_folder='..\..\data\VMP\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\';
-date_campaign="20250211"; % Should match the date in "load_parameters" function except if "default" is used
+date_campaign="20250626"; % Should match the date in "load_parameters" function except if "default" is used
 run_quick_look=true; % Apply quick_look function from Rockland (shear dissipation only)
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
 calibrate_FP07=true; % Calibrate FP07
 run_dissip=true; % Compute dissipation based on Bieito's and Sebastiano's script
 cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
 make_plot_prof = true; % Make profile-related plots.
-make_plot_spectra = false; % Make spectra plots (temperature and shear spectra).
+ind_plot_spectra = 10; % Indices of bins where spectra should be plotted (temperature and shear spectra).
 
 addpath(odas_folder)
 addpath("..\..\functions\microstructure\") % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
-%param.filename_list={'VMP010'};
+param.filename_list={'VMP004'};
 % param.info.dpD=0.5; % 0.5 m bin size
 % param.info.num_fft =5; 
 
@@ -69,7 +69,7 @@ for kf=1:length(param.filename_list)
     %% 1st conversion to physical units
     default_parameters=odas_p2mat;
     %default_parameters.speed_tau=0.68/0.99999*2/64; % To avoid smoothing W
-    data_prof=odas_p2mat([param.folder,param.filename_list{kf},'.P'],default_parameters);
+    data_prof=odas_p2mat_print([param.folder,param.filename_list{kf},'.P'],false,default_parameters);
    
    
     %% Modify and patch the config file (data_prof is reloaded)
@@ -190,7 +190,7 @@ for kf=1:length(param.filename_list)
         % Turbulence analysis
         tic
         [BINNED0{counter},SLOW0{counter}, FAST0{counter}] = ...
-            resolve_turbulence(data_prof,kprof,param,folder_out,counter,make_plot_prof,make_plot_spectra,run_dissip);
+            resolve_turbulence(data_prof,kprof,param,folder_out,counter,make_plot_prof,ind_plot_spectra,run_dissip);
         toc  
 
         % ------------------------------------------------------------------
