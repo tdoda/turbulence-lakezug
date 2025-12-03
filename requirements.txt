@@ -1,0 +1,4 @@
+# existing dependencices
+# ...
+# add the Pyodide kernel
+jupyterlite-pyodide-kernel
