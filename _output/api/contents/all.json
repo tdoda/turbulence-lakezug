@@ -2,11 +2,11 @@
   "content": [
     {
       "content": null,
-      "created": "2025-12-03T13:48:48.584463Z",
+      "created": "2025-12-03T14:09:19.300981Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
-      "last_modified": "2025-12-03T13:48:48.605970Z",
+      "last_modified": "2025-12-03T14:09:19.301981Z",
       "mimetype": null,
       "name": "Figures_ctd",
       "path": "Figures_ctd",
@@ -16,7 +16,7 @@
     },
     {
       "content": null,
-      "created": "2025-12-03T13:48:48.732502Z",
+      "created": "2025-12-03T14:09:19.394581Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
@@ -29,11 +29,11 @@
       "writable": true
     }
   ],
-  "created": "2025-12-03T13:48:48.583472Z",
+  "created": "2025-12-03T14:09:19.300981Z",
   "format": "json",
   "hash": null,
   "hash_algorithm": null,
-  "last_modified": "2025-12-03T13:48:48.732502Z",
+  "last_modified": "2025-12-03T14:09:19.394581Z",
   "mimetype": null,
   "name": "",
   "path": "",
