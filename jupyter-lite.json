@@ -20,6 +20,11 @@
       },
       {
         "extension": "./extension",
+        "load": "static/remoteEntry.a117bd216cefa0b341fe.js",
+        "name": "@jupyterlite/pyodide-kernel-extension"
+      },
+      {
+        "extension": "./extension",
         "load": "static/remoteEntry.61b436d51fa5d6bf3a5f.js",
         "name": "jupyter-matplotlib"
       },
@@ -405,7 +410,14 @@
     },
     "fullLabextensionsUrl": "./extensions",
     "fullStaticUrl": "./build",
-    "licensesUrl": "./lab/api/licenses"
+    "licensesUrl": "./lab/api/licenses",
+    "litePluginSettings": {
+      "@jupyterlite/pyodide-kernel-extension:kernel": {
+        "pipliteUrls": [
+          "./extensions/@jupyterlite/pyodide-kernel-extension/static/pypi/all.json?sha256=783d01f64a330ecbbd82318ba2fde8842bc8eece502b821b8c0f57cacdde5cdc"
+        ]
+      }
+    }
   },
   "jupyter-lite-schema-version": 0
 }
