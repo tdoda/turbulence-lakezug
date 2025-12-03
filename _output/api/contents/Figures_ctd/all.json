@@ -2,7 +2,7 @@
   "content": [
     {
       "content": null,
-      "created": "2025-12-03T14:09:19.301981Z",
+      "created": "2025-12-03T14:29:02.285806Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
@@ -15,11 +15,11 @@
       "writable": true
     }
   ],
-  "created": "2025-12-03T14:09:19.300981Z",
+  "created": "2025-12-03T14:29:02.284802Z",
   "format": "json",
   "hash": null,
   "hash_algorithm": null,
-  "last_modified": "2025-12-03T14:09:19.301981Z",
+  "last_modified": "2025-12-03T14:29:02.285806Z",
   "mimetype": null,
   "name": "Figures_ctd",
   "path": "Figures_ctd",
