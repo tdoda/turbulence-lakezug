@@ -1,0 +1,29 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2025-12-03T13:09:07.536010Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2025-01-30T10:26:35.340434Z",
+      "mimetype": "image/png",
+      "name": "profiles_transect.png",
+      "path": "Figures_ctd/profiles_transect.png",
+      "size": 705358,
+      "type": "file",
+      "writable": true
+    }
+  ],
+  "created": "2025-12-03T13:09:07.535903Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2025-12-03T13:09:07.536010Z",
+  "mimetype": null,
+  "name": "Figures_ctd",
+  "path": "Figures_ctd",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
