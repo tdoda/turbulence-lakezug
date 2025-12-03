@@ -1,7 +1,7 @@
 {
   "LiteBuildConfig": {
     "contents": ["notebooks"],
-    "output_dir": "_output"
+    "output_dir": "_output",
 	"base_url": "/turbulence-lakezug/"
   }
 }
