@@ -532,8 +532,8 @@ for i = 1:n_pres %length(pres)
         Nfft = floor(length(jp)/2);
     end
 
-    if isfield(info,'overlap')
-        overlap = info.overlap; % If overlap for spectral analysis is specified
+    if isfield(info,'overlap_pct') % If overlap percentage for spectral analysis is specified
+        overlap = round(info.overlap_pct/100*Nfft);
     else
         overlap = round(Nfft/2); % Default overlap for spectral analysis: 50 %
     end

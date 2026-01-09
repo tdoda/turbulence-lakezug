@@ -24,7 +24,8 @@ param.info.fAA = 90; % ~90%*f_AA, where f_AA = 98 Hz
 %param.info.Tmethod = 'B'; % Options: 'B'=Batchelor; 'K'=Kraichnan
 param.info.Tspec = 'K';% Options: 'B'=Batchelor; 'K'=Kraichnan
 param.info.q = 5.26; %3.7; %5.26; %5.26; %2; %1.5; %3.9; %%% q turbulent parameter
-param.info.num_fft = 3; % number of fft lengths (with 50% overlapping): typically 3 or 5
+param.info.num_fft = 3; % number of fft segments (with 50% overlapping by default): typically 3 or 5
+param.info.overlap_pct = 50; % percentage of overlap between fft segments: typically 50%
 param.info.int_range = 'L'; % integration range, options: 'S'=Steinbuck 2009; 'L'=Luketina and Imberger 2001
 param.info.time_corr = 'NAS'; % Options: 'RSI'; 'KOC'= Kocsis (tau=tau0*W^{-0.5}), 'NAS'=Nash et al., 1999 (tau=tau0*W^{-0.12})
 param.info.time_res = 0.0058; %0.0035;  0.0058   %%% 0.0-> no time response correction. Used only if time_corr='KOC' or 'NAS'
