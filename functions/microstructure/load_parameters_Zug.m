@@ -17,7 +17,9 @@ function [param] = load_parameters_Zug(lakename,date,general_data_folder,directi
 
 param.info.mindur_detect = 30; % Minimim duration of a profile [s]
 param.info.minvel_detect=0.1; % Minimum speed for profile detection [m/s]
-param.info.minKT = 1;
+param.info.minKT = 1; % Minimum wavenumber for temperature spectral integration [cpm]
+param.info.minKS = 0.1; % Minimum wavenumber for shear spectral integration [cpm]
+param.info.maxKS = 14; % Maximum wavenumber for shear spectral integration [cpm]
 param.info.fAA = 90; % ~90%*f_AA, where f_AA = 98 Hz
 %param.info.Tmethod = 'B'; % Options: 'B'=Batchelor; 'K'=Kraichnan
 param.info.Tspec = 'K';% Options: 'B'=Batchelor; 'K'=Kraichnan
@@ -287,6 +289,40 @@ elseif strcmp(date,'20250626')
     param.config.S2=true;
     param.config.uC1=false;
     param.config.uC2=false;
+%**************************************************************************
+elseif strcmp(date,'20251126') 
+    param.folder = [general_data_folder,'20251126\Level0\'];
+    param.filename_list={'VMP003','VMP004','VMP005','VMP009','VMP010'}; % Several files can be listed here
+
+    % Set P offset and sh probe sensitivity
+    param.offset_P=-0.15;
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_2025_11_26';
+
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=false;
+    param.config.uC1=false;
+    param.config.uC2=false;
+    %**************************************************************************
+elseif strcmp(date,'20251127') 
+    param.folder = [general_data_folder,'20251127\Level0\'];
+    param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006'}; % Several files can be listed here
+
+    % Set P offset and sh probe sensitivity
+    param.offset_P=-0.15;
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_2025_11_27';
+
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=false;
+    param.config.uC1=false;
+    param.config.uC2=false;
+    
+    
 else
     error("Invalid campaign date")
 end

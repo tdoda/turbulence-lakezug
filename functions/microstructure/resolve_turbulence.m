@@ -38,12 +38,6 @@ end
 info=param.info;
 
 
-%constants
-%visco = 1e-6;
-%SEB: changed D (see below)
-%D = 1.44e-7;
-
-
 %defines times
 time_fast0 = (0:1:length(DATA.P_fast)-1)/DATA.fs_fast; % [s]
 time_slow0= (0:1:length(DATA.P_slow)-1)/DATA.fs_slow; % [s]
@@ -395,25 +389,30 @@ if  ~isempty(AA) && info.despike_A(1) ~= inf
     end
 end
 
-if param.config.S2
-    %-- identify the piezo-accelerometer signal to be used for noise filtering
-    % Compute autospectra of the detrended signals of sh1, Ax and Ay (i.e., residuals with
-    % respect to linear fit)
-    PSDsh = csd_odas(detrend(sh1_hp),detrend(sh1_hp),1024,fsf,[],512,'linear');
-    PSDA1 = csd_odas(detrend(AA(:,1)),detrend(AA(:,1)),1024,fsf,[],512,'linear');
-    PSDA2 = csd_odas(detrend(AA(:,2)),detrend(AA(:,2)),1024,fsf,[],512,'linear');
-    % Compute cross-spectra sh1-Ax and sh1-Ay:
-    CSDshA1 = csd_odas(detrend(sh1_hp),detrend(AA(:,1)),1024,fsf,[],512,'linear');
-    [CSDshA2,fA] = csd_odas(detrend(sh1_hp),detrend(AA(:,2)),1024,fsf,[],512,'linear');
-    COHshA1 = abs(CSDshA1.^2./(PSDA1.*PSDsh));
-    COHshA2 = abs(CSDshA2.^2./(PSDA2.*PSDsh));
-    AAxy=AA; % store both signals
-    if nanmean(COHshA1)>nanmean(COHshA2)
-        AA = AA(:,1);
-    else
-        AA = AA(:,2);
-    end
+%if param.config.S2 % Remove the condition to have 2nd Shear probe (T.
+%Doda, 08.01.2026)
+
+%-- identify the piezo-accelerometer signal to be used for noise filtering
+% Compute autospectra of the detrended signals of sh1, Ax and Ay (i.e., residuals with
+% respect to linear fit)
+PSDsh = csd_odas(detrend(sh1_hp),detrend(sh1_hp),1024,fsf,[],512,'linear');
+PSDA1 = csd_odas(detrend(AA(:,1)),detrend(AA(:,1)),1024,fsf,[],512,'linear');
+PSDA2 = csd_odas(detrend(AA(:,2)),detrend(AA(:,2)),1024,fsf,[],512,'linear');
+% Compute cross-spectra sh1-Ax and sh1-Ay:
+CSDshA1 = csd_odas(detrend(sh1_hp),detrend(AA(:,1)),1024,fsf,[],512,'linear');
+[CSDshA2,fA] = csd_odas(detrend(sh1_hp),detrend(AA(:,2)),1024,fsf,[],512,'linear');
+% Compute magnitude-squared coherence ranging from 0 to 1 and measuring how strongly 
+% accelerometer and shear signals are linearly related at each frequency
+COHshA1 = abs(CSDshA1.^2./(PSDA1.*PSDsh));
+COHshA2 = abs(CSDshA2.^2./(PSDA2.*PSDsh));
+AAxy=AA; % store both signals
+if nanmean(COHshA1)>nanmean(COHshA2)
+    AA = AA(:,1);
+else
+    AA = AA(:,2);
 end
+
+%end
 
 FAST.AA_filt = AA;
 
@@ -459,15 +458,15 @@ BIN.kU_S2 = nan(1,length(pres));
 BIN.Xi_ST1 = nan(1,length(pres));
 BIN.Xi_T1 = nan(1,length(pres));
 BIN.kB_T1 = nan(1,length(pres));
-BIN.sXif1 = nan(1,length(pres));
-BIN.sKB1 = nan(1,length(pres));
+%BIN.sXif1 = nan(1,length(pres));
+%BIN.sKB1 = nan(1,length(pres));
 BIN.Xiv1 = nan(1,length(pres));
 BIN.kU_T1 = nan(1,length(pres));
 BIN.eps_T1 = nan(1,length(pres));
 BIN.epsT1max = nan(1,length(pres));
 BIN.MAD_ST1 = nan(1,length(pres));
 BIN.MAD_T1 = nan(1,length(pres));
-BIN.LKH1 = nan(1,length(pres));
+%BIN.LKH1 = nan(1,length(pres));
 BIN.LR_T1 = nan(1,length(pres));
 BIN.krange_T1 = nan(1,length(pres));
 BIN.flag_T1 = nan(1,length(pres));
@@ -613,15 +612,15 @@ for i = 1:n_pres %length(pres)
                 if param.config.S2
                     try
                         % [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                        %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
                         [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
+                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
                         [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
-                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
-                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
-                        BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(visco*D^2))^(1/4);
+                            TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AAxy(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
+                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(kin_visco*D^2))^(1/4);
+                        BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(kin_visco*D^2))^(1/4);
                         % Batchelor wavenumber determined from shear probe used
                         % to calculate Xi_ST:
                         if (BIN.flag_S1(i)==0 && BIN.flag_S2(i)==1)
@@ -637,10 +636,10 @@ for i = 1:n_pres %length(pres)
                 else
                     try
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                        %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+                        %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
                         [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
-                            TKE_dis_spec(Pf(jp),sh1_hp(jp),AAxy(jp),0.1,14,info.fAA,visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
-                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(visco*D^2))^(1/4);
+                            TKE_dis_spec(Pf(jp),sh1_hp(jp),AAxy(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
+                        BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(kin_visco*D^2))^(1/4);
                         meanKBSH=BIN.kB_S1(i); % Batchelor wavenumber determined from shear probe used to calculate Xi_ST
                     catch
                         warning('Shear (S1) spectral calculations did not work in this bin')
@@ -660,12 +659,12 @@ for i = 1:n_pres %length(pres)
     if  run_dissip
         if param.config.T1
             % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
-            %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
+            %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
             try
                 [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),BIN.MADc(i),BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i),BIN.SPECTRUMT1(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),info.ksfact,info.Snfact);
-                BIN.eps_T1(i) = visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
-                BIN.epsT1max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
+                    gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),info.ksfact,info.Snfact);
+                BIN.eps_T1(i) = kin_visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
+                BIN.epsT1max(i) = kin_visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
                 warning('FP07-T1 spectral calculations did not work in this bin')
             end
@@ -674,15 +673,15 @@ for i = 1:n_pres %length(pres)
         if param.config.T2
             try
                 % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
-                %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
+                %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
                 %
                 [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),MADc_val,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i),BIN.SPECTRUMT2(i)] =...
-                    gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),info.ksfact,info.Snfact);
+                    gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),info.ksfact,info.Snfact);
                 if isnan(BIN.MADc(i))
                     BIN.MADc(i)=MADc_val; % Use the threshold value from T2
                 end
-                BIN.eps_T2(i) = visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
-                BIN.epsT2max(i) = visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
+                BIN.eps_T2(i) = kin_visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
+                BIN.epsT2max(i) = kin_visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
                 warning('FP07-T2 spectral calculations did not work in this bin')
             end
