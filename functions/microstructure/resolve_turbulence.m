@@ -518,9 +518,9 @@ for i = 1:n_pres %length(pres)
     D = cond/(avsigmat*cp); % Thermal diffusivity
     BIN.Diff(i)=D;
 
-    visco = SW_Viscosity(avT,'C',avS,'ppt'); % dynamic viscosity mu
-    BIN.DynVisco(i)=visco;
-    kin_visco = visco/avsigmat; % kinematic viscosity nu
+    dyn_visco = SW_Viscosity(avT,'C',avS,'ppt'); % dynamic viscosity mu
+    BIN.DynVisco(i)=dyn_visco;
+    kin_visco = dyn_visco/avsigmat; % kinematic viscosity nu
     BIN.KinVisco(i)=kin_visco;
 
     % Speed (added by T. Doda)
