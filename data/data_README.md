@@ -8,7 +8,7 @@ You can find all VMP data files [here](https://unils-my.sharepoint.com/:f:/g/per
 
 ## microCTD data
 
-The Level0 and Level2 VMP data is too large to be stored on Github: all .p, .mat and .png files are ignored by git (see `.gitignore` file).
+The Level0 and Level2 microCTD data is too large to be stored on Github: all .p, .mat and .png files are ignored by git (see `.gitignore` file).
 
-You can find all VMP data files [here](https://unils-my.sharepoint.com/:f:/g/personal/tomy_doda_unil_ch/IgBKyrwhSDrHSrBUg-kQIKItAV7mCCdnnlFq3EH1wXBnS7Q?e=5Qt9yU) and copy them to your local repository.
+You can find all microCTD data files [here](https://unils-my.sharepoint.com/:f:/g/personal/tomy_doda_unil_ch/IgBKyrwhSDrHSrBUg-kQIKItAV7mCCdnnlFq3EH1wXBnS7Q?e=5Qt9yU) and copy them to your local repository.
 
