@@ -21,7 +21,7 @@ function [data_prof,press_atm]=correct_pressure(data_prof,param,ind_prof_slow,in
 %   press_atm (double): atmospheric pressure subtracted to the raw pressure
 %   to get the pressure relative to the air [dbar].
 %
-% T. Doda based on S. Piccolroaz, last version: 12.01.2026
+% T. Doda based on S. Piccolroaz, 09.12.2024
 %% Compute pressure relative to the atmosphere
 
 % Computed variables:
@@ -58,33 +58,18 @@ if strcmp(param.info.prof_dir,'up')
     ind_prof_slow_x=ind_prof_slow(2,kprof)-round(irange*data_prof.fs_slow):ind_prof_slow(2,kprof)+round(irange*data_prof.fs_slow);
     ind_prof_fast_x=ind_prof_fast(2,kprof)-round(irange*data_prof.fs_fast):ind_prof_fast(2,kprof)+round(irange*data_prof.fs_fast);
 
-    if strcmp(param.atm_press_method,'cond') && isfield(data_prof,'C1_fast') % Use the microC data
-        fprintf(">>> microcond used to detect the surface")
+    if isfield(data_prof,'C1_fast') % Use the microC data
         istop=ischange(data_prof.gradC1(ind_prof_fast_x),'linear'); % Abrupt changes in the slope of gradC1 (=peak)
         istop=find(istop==1,1,'first'); istop=istop-2-ceil(abs(0.001/data_prof.W_fast(ind_prof_fast_x(istop))*data_prof.fs_fast));   % shear probes are 1 mm apart from micro cond. Account also for time response (2 counts to be safe)
-    elseif strcmp(param.atm_press_method,'FP07')% Use the FP07 data
-        fprintf(">>> FP07 used to detect the surface")
+    else % Use the FP07 data
         istop=ischange(data_prof.gradT1(ind_prof_fast_x),'linear','maxnumchanges',1); % Abrupt changes in the slope of gradT1 (=peak)
         istop=find(istop==1,1,'first'); istop=istop-5-ceil(abs(0.003/data_prof.W_fast(ind_prof_fast_x(istop))*data_prof.fs_fast));   % shear probes are 3 mm apart from micro temp. Account also for the time response: 0.007 s *512 count/s ~ 4 counts (5 counts to be safe)
-    elseif strcmp(param.atm_press_method,'min')
-        press_atm=min(data_prof.P_slow_raw); % Miminum pressure of the file = atmospheric pressure
-        istop=[];
-    elseif strcmp(param.atm_press_method,'offset')
-        istop=[]; 
-    else
-        error("Wrong atm pressure method!")
     end
 
-    % Compute press_atm with 'cond', 'FP07' and 'offset' methods:
-    if ~strcmp(param.atm_press_method,'min')
-        if isempty(istop)
-            if ~strcmp(param.atm_press_method,'offset') % Display warning only if offset was not the chosen method
-                warning("No surface detection! Assume press_atm=0.")
-            end
-            press_atm=0; % Assumes that pressure was already corrected with coef0?
-        else
-            press_atm = data_prof.P_fast_raw(ind_prof_fast_x(istop));   % correction
-        end
+    if isempty(istop)
+        press_atm=0; % Assumes that pressure was already corrected with coef0?
+    else
+        press_atm = data_prof.P_fast_raw(ind_prof_fast_x(istop));   % correction
     end
 
     % Correct pressure only for the specific profile
@@ -93,17 +78,7 @@ if strcmp(param.info.prof_dir,'up')
     ind_prof_fast_plot=ind_prof_fast_x;
     ind_prof_slow_plot=ind_prof_slow_x*data_prof.fs_fast/data_prof.fs_slow;
 else % Downward profile
-
-    if strcmp(param.atm_press_method,'min')
-        press_atm=min(data_prof.P_slow_raw); % Miminum pressure of the file = atmospheric pressure
-        istop=[];
-    elseif strcmp(param.atm_press_method,'offset')
-        istop=[]; 
-        press_atm=0;
-    else % Methods 'cond' and 'FP07' do not apply to downward profiles
-        error("Wrong atm pressure method!") 
-    end
-
+    press_atm=min(data_prof.P_slow_raw); % Miminum pressure of the file = atmospheric pressure
     P_slow_corr = data_prof.P_slow_raw-press_atm;
     P_fast_corr = data_prof.P_fast_raw-press_atm;
     irange=0.0; % [s], keep the first profiling index
@@ -115,14 +90,14 @@ else % Downward profile
 end
 
 fprintf('>>>>> Atmospheric pressure: %0.3f dbar\n',press_atm)
-%% Re-load the profile with pmin=0 (T. Doda: this part was originally in resolve_profile_all)
+%% Re-load the profile with pmin=0 (this part was originally in resolve_profile_all)
 data_prof.ind_prof_slow = get_profile(P_slow_corr,data_prof.W_slow,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_slow);
 data_prof.ind_prof_fast  = get_profile(P_fast_corr,data_prof.W_fast,0,...
     param.info.minvel_detect,param.info.prof_dir,param.info.mindur_detect,data_prof.fs_fast);
-[~,data_prof.Nprf] = size(data_prof.ind_prof_slow); % Number of profiles
+[~,data_prof.Nprf] = size(ind_prof_slow); % Number of profiles
 
-if size(data_prof.ind_prof_slow,2)~=data_prof.Nprf
+if size(ind_prof_slow,2)~=data_prof.Nprf
     error('Change in number of profiles!')
 end
 
@@ -144,6 +119,7 @@ if make_plot
         % Plot from S. Piccolroaz
         figure
         set(gcf, 'Units', 'centimeters', 'Position', [1 1 20 8]);
+        subplot(1,Nprf,counter)
         plot(ind_prof_fast_plot,data_prof.P_fast(ind_prof_fast_plot),'.-k'); hold on
         if isfield(data_prof,'C1_fast')
             plot(ind_prof_fast_plot,normalize(data_prof.C1_fast(ind_prof_fast_plot))/2,'-g');

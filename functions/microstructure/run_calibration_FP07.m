@@ -43,7 +43,7 @@ if param.config.T2
 end
 
 
-%% Re-pacth the P-file
+%% Re-patch the P-file
 % if exist(modified_data_file,'file')
 %     delete(modified_data_file)
 % end

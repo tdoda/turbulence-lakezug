@@ -1,26 +1,10 @@
 function [data_prof,modified_data_file,cfgfile_mod] = get_config(param,data_prof,folder_out,modify_cfg,kf,space_cfg)
-%GET_CONFIG Get the configuration file from the P file and modify it if necessary 
-% (pressure offset and shear sensitivities) + patch it to the .P file
-%  
-%   INPUTS:
-%   param (structure): parameters specific to the campaign.
-%   data_prof (structure): profiling data from a given data file (output of
-%   odas_p2mat).
-%   folder_out (string): path to the output folder.
-%   modify_cfg (boolean): = True to modify cdf file. 
-%   kf (integer): index of the data file among the list of files in param.
-%
-%   OUTPUTS:
-%   data_prof (structure): profiling data from a given data file,
-%   re-imported with odas_p2mat using the modified cgf file.
-%   modified_data_file (string): path to the .P file with modified
-%   configuration
-%   cfgfile_mod (string): path to the modified .cfg file 
-%   space_cfg [optional]: = True if spaces between name and values in cfg
-% file. Default=True.
-%
-% T. Doda based on S. Piccolroaz, last version: 12.01.2026
-%% Set up parameters
+%GET_CONFIG Get the configuration file from the P file and modify it if necessary + patch it to the .P file
+% space_cfg [optional]: = True if spaces between name and values in cfg
+% file. Default=True
+%   Detailed explanation goes here
+
+
 if nargin<6
     space_cfg=true;
 end
@@ -31,6 +15,8 @@ else
     equal_charact='=';
 end
 
+
+
 filename0 = param.filename_list{kf};
 filename = [filename0,'_patched'];
 original_data_file=[param.folder,filename0,'.P'];
@@ -38,29 +24,20 @@ modified_data_file=[folder_out,filename,'.P'];
 
 extract_setupstr(original_data_file, [folder_out 'setup_' filename0 '_original' '.cfg']); % Save the config file from the original .P file
 
-if exist(modified_data_file,'file')
-    delete(modified_data_file)
-    warning('Delete already existing patched data file')
-end
-copyfile(original_data_file,modified_data_file); % Create a copy of the P file where the configuration file will be modified
-
 if modify_cfg
-    disp('>>> Modification of the configuration file...'); 
+    disp('>>> Modification of the configuration file...');
+    if exist(modified_data_file,'file')
+        delete(modified_data_file)
+        warning('Delete already existing patched data file')
+    end
+    copyfile(original_data_file,modified_data_file); % Create a copy of the P file where the configuration file will be modified
+    
     cfgfile_mod=[folder_out 'setup_' filename0 '_modified'];
-    
-    
-    
     if exist([cfgfile_mod '.cfg'],'file') % Delete any existing modified config file
         delete([cfgfile_mod '.cfg'])
         warning('Delete already existing modified config file')
     end
     if isfield(param,'cfgfile')&&~isempty(param.cfgfile) % Get the configuration from the specified configuration file
-        if strcmp(param.atm_press_method,'offset')
-            answ=input("WARNING: the pressure offset will only be applied if it has been included in the config file. Continue (Y/N)?",'s');
-            if ~strcmp(answ,"Y") && ~strcmp(answ,"y")
-                error("Stop the analysis: please update the config file or change the pressure correction method")
-            end
-        end
         patch_setupstr(modified_data_file,[param.folder,param.cfgfile]);
         copyfile([param.folder param.cfgfile '.cfg'],[cfgfile_mod '.cfg']); fileattrib([cfgfile_mod '.cfg'],'+w');
     else % Use the configuration specified in the parameters
@@ -68,8 +45,6 @@ if modify_cfg
         % a temporary file:
         extract_setupstr(modified_data_file, [cfgfile_mod '.cfg']);
 
-
-        
         % Fix the Sensitivity of the shear probe
         A = regexp(fileread([cfgfile_mod '.cfg']),'\n','split'); % Cell array with each cell = a row of the config file
         ind_sh = find(contains(A,['sens', equal_charact])); % Indices of the lines where sensitivity is saved

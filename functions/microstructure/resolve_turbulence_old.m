@@ -1,10 +1,9 @@
-function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,profID,make_plot_prof,ind_plot_spectra,run_dissip,show_progress)
+function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,profID,make_plot_prof,ind_plot_spectra,run_dissip)
 %RESOLVE_TURBULENCE Compute turbulence estimates for a given profile based on the function
 %"resolve_microCTD_profile_all".
 %
 %   INPUTS:
-%   DATA (structure): profiling data from a given data file (output of
-%   odas_p2mat).
+%   DATA (structure): profiling data from a given data file.
 %   prof (int): profile index between 1 and Nprf.
 %   param (structure): parameters specific to the campaign.
 %   folder_out (string): path to the output folder.
@@ -15,8 +14,6 @@ function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,prof
 %   0.
 %   run_dissip (boolean) [optional]: = True if turbulence analysis should
 %   be done. Default value: True.
-%   show_progress (boolean) [optional]: = True to show progress bar and warning messages. 
-%   Default value: True.
 %
 %
 %   OUTPUTS:
@@ -24,22 +21,18 @@ function [BIN,SLOW,FAST] = resolve_turbulence(DATA, kprof, param,folder_out,prof
 %   SLOW (structure): low-frequency quantities.
 %   FAST (structure): high-frequency quantities.
 %
-% T. Doda based on S. Piccolroaz, last version: 22.01.2026
+% T. Doda based on S. Piccolroaz
 %% Set up parameters
-if nargin<6
+if nargin<7
     make_plot_prof=false;
 end
 
-if nargin<7
+if nargin<8
     ind_plot_spectra=0;
 end
 
-if nargin<8
-    run_dissip=true;
-end
-
 if nargin<9
-    show_progress=true;
+    run_dissip=true;
 end
 
 info=param.info;
@@ -61,6 +54,7 @@ end
 %gets index for the desired profile
 iipf = ind_prof_fast(1,kprof):ind_prof_fast(2,kprof);
 iips = ind_prof_slow(1,kprof):ind_prof_slow(2,kprof);
+
 
 %date
 % date = datenum(DATA.Year, DATA.Month, DATA.Day, DATA.Hour, DATA.Minute, DATA.Second );
@@ -179,10 +173,9 @@ if ismember(info.prof_dir,'up')
 else
     FAST.upward = 0;
 end
-%FAST.dtsec=timef;
-FAST.dtsec=DATA.t_fast(iipf); % s, time from odas_p2mat()
+FAST.dtsec=timef;
+FAST.dtsec2=DATA.t_fast(iipf); % s, time from odas_p2mat()
 FAST.pressure = Pf;
-FAST.raw_pressure=DATA.P_fast_raw(iipf); 
 FAST.velocity=Wf;
 FAST.fast_T1 = T1f;
 FAST.grad_T1 = gradT1f;
@@ -195,8 +188,8 @@ FAST.fast_S2 = sh2;
 FAST.A_x = Ax;
 FAST.A_y = Ay;
 FAST.depth = interp1(Ps,depth,Pf,'linear','extrap');
-FAST.sigmatT1 = DATA.rhoT1S(iipf);
-FAST.sigmatT2 = DATA.rhoT2S(iipf);
+FAST.sigmatT1 = DATA.rhoT1S;
+FAST.sigmatT2 = DATA.rhoT2S;
 
 %% Create SLOW structure
 SLOW.datenum = FAST.datenum;
@@ -206,10 +199,9 @@ if ismember(info.prof_dir,'up')
 else
     SLOW.upward = 0;
 end
-%SLOW.dtsec=times; % s
-SLOW.dtsec=DATA.t_slow(iips); % s, time from odas_p2mat()
+SLOW.dtsec=times; % s
+SLOW.dtsec2=DATA.t_slow(iips); % s, time from odas_p2mat()
 SLOW.pressure = Ps;
-SLOW.raw_pressure=DATA.P_slow_raw(iips);
 SLOW.velocity=Ws;
 SLOW.depth = depth;
 SLOW.temperature = T_JAC;
@@ -505,9 +497,7 @@ BIN.flag_ST2 = nan(1,length(pres));
 
 disp('>>>>> Compute turbulence quantities from shear and FP07')
 for i = 1:n_pres %length(pres)
-    if show_progress
-        fprintf('>>>>>>> Progress: %d/%d (%0.2f %%)\n',i,n_pres,i/n_pres*100)
-    end
+    fprintf('>>>>>>> Progress: %d/%d (%0.2f %%)\n',i,n_pres,i/n_pres*100)
     jp = find(Pf>=pres(i)-info.dpD/2 & Pf<=pres(i)+info.dpD/2); % cell indices that are part of bin i in fast channels
     jps = find(Ps>=pres(i)-info.dpD/2 & Ps<=pres(i)+info.dpD/2);   % cell indices that are part of bin i in slow channels
 
@@ -533,7 +523,7 @@ for i = 1:n_pres %length(pres)
     BIN.KinVisco(i)=kin_visco;
 
     % Speed (added by T. Doda)
-    BIN.speed(i)=nanmean(DATA.speed_slow(iips(jps)));
+    BIN.speed(i)=nanmean(DATA.speed_slow(jps));
 
     if isfield(info,'num_fft')
         Nfft = floor(length(jp)/((info.num_fft+1)/2));
@@ -608,7 +598,6 @@ for i = 1:n_pres %length(pres)
         BIN.flag_acceleration(i) = NaN;
     end
 
-    
     %% Shear spectral calculations
     close all % Close all the figures
     if ismember(i,ind_plot_spectra)
@@ -625,21 +614,12 @@ for i = 1:n_pres %length(pres)
                         %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                         %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1, BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                             TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
-                        [BIN.eps_S2(i), BIN.MAD_S2(i), ~,flag_good_S2,  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
+                        [BIN.eps_S2(i), BIN.MAD_S2(i), ~,BIN.flag_S2(i),  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
                             TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
                         BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(kin_visco*D^2))^(1/4);
                         BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(kin_visco*D^2))^(1/4);
-                        
-                        % Flag indices defined as =1 for bad data (opposite of TKE_dis_spec):
-                        if ~isnan(flag_good_S1)
-                            BIN.flag_S1(i)=~flag_good_S1;
-                        end
-                        if ~isnan(flag_good_S2)
-                            BIN.flag_S2(i)=~flag_good_S2;
-                        end
-                        
                         % Batchelor wavenumber determined from shear probe used
                         % to calculate Xi_ST:
                         if (BIN.flag_S1(i)==0 && BIN.flag_S2(i)==1)
@@ -656,15 +636,8 @@ for i = 1:n_pres %length(pres)
                     try
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                         %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1,  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                             TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
-                        
-                        % Flag indices defined as =1 for bad data (opposite of TKE_dis_spec):
-                        if ~isnan(flag_good_S1)
-                            BIN.flag_S1(i)=~flag_good_S1;
-                        end
-                        
-                        
                         BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(kin_visco*D^2))^(1/4);
                         meanKBSH=BIN.kB_S1(i); % Batchelor wavenumber determined from shear probe used to calculate Xi_ST
                     catch
@@ -676,6 +649,7 @@ for i = 1:n_pres %length(pres)
             error('Nasmyth_spec is not EPFL')
         end
     end
+
     %% FP07 spectral calculations
     if ~exist('meanKBSH','var') % Batchelor wavenumber has not been calculated from shear probe --> set it to zero
         meanKBSH=0;
@@ -686,20 +660,12 @@ for i = 1:n_pres %length(pres)
             % [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),~,BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i)] =...
             %     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
             try
-                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),BIN.MADc(i),BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),flag_good_T1,BIN.SPECTRUMT1(i)] =...
+                [BIN.Xiv1(i),BIN.Xi_ST1(i),BIN.Xi_T1(i),BIN.kB_T1(i),BIN.eps_T1(i),BIN.MAD_ST1(i),BIN.MAD_T1(i),BIN.MADc(i),BIN.LR_T1(i),BIN.kL_T1(i),BIN.kU_T1(i),BIN.krange_T1(i), BIN.kpeak_T1(i),BIN.flag_T1(i),BIN.SPECTRUMT1(i)] =...
                     gradT_dis_spec(Pf(jp),gradT1f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T1_dT1,'T1_dT1',DATA.setupfilestr,make_plot_spectra,Pf(jp),T1f(jp),info.ksfact,info.Snfact);
-                
-                % Flag indices defined as =1 for bad data (opposite of gradT_dis_spec):
-                if ~isnan(flag_good_T1)
-                    BIN.flag_T1(i)=~flag_good_T1;
-                end
-                
                 BIN.eps_T1(i) = kin_visco*D^2*(2*pi()*BIN.kB_T1(i))^4;
                 BIN.epsT1max(i) = kin_visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
-                if show_progress
-                    warning('FP07-T1 spectral calculations did not work in this bin')
-                end
+                warning('FP07-T1 spectral calculations did not work in this bin')
             end
         end
 
@@ -708,22 +674,15 @@ for i = 1:n_pres %length(pres)
                 % [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),~,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i)] =...
                 %     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),folder_out,filename,profID);
                 %
-                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),MADc_val,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),flag_good_T2,BIN.SPECTRUMT2(i)] =...
+                [BIN.Xiv2(i),BIN.Xi_ST2(i),BIN.Xi_T2(i),BIN.kB_T2(i),BIN.eps_T2(i),BIN.MAD_ST2(i),BIN.MAD_T2(i),MADc_val,BIN.LR_T2(i),BIN.kL_T2(i),BIN.kU_T2(i),BIN.krange_T2(i), BIN.kpeak_T2(i),BIN.flag_T2(i),BIN.SPECTRUMT2(i)] =...
                     gradT_dis_spec(Pf(jp),gradT2f(jp),info.minKT,info.fAA,meanKBSH,WW, Nfft, overlap,info.Tspec,info.q,info.time_res,info.time_corr,info.npoles,info.int_range,D,kin_visco,T2_dT2,'T2_dT2',DATA.setupfilestr,make_plot_spectra,Pf(jp),T2f(jp),info.ksfact,info.Snfact);
-                % Flag indices defined as =1 for bad data (opposite of gradT_dis_spec):
-                if ~isnan(flag_good_T2)
-                    BIN.flag_T2(i)=~flag_good_T2;
-                end
-                
                 if isnan(BIN.MADc(i))
                     BIN.MADc(i)=MADc_val; % Use the threshold value from T2
                 end
                 BIN.eps_T2(i) = kin_visco*D^2*(2*pi()*BIN.kB_T2(i))^4;
                 BIN.epsT2max(i) = kin_visco*D^2*(2*pi()*info.fAA/WW*info.kmax_factor)^4;
             catch
-                if show_progress
-                    warning('FP07-T2 spectral calculations did not work in this bin')
-                end
+                warning('FP07-T2 spectral calculations did not work in this bin')
             end
         end
 
@@ -771,7 +730,6 @@ if run_dissip
     BIN.flag_ST2(idx)=NaN;
 
     % Create txt file if flag(s) exist(s)
-    % Number of bins with bad data:
     flagvib = length(BIN.flag_vibration(BIN.flag_vibration==1));
     flaginc = length(BIN.flag_inclination(BIN.flag_inclination==1));
     flagacc = length(BIN.flag_acceleration(BIN.flag_acceleration==1));
@@ -821,11 +779,8 @@ if run_dissip
 
     % Display flagging % data removed:
     disp('************************************')
-    fprintf('Percentage of data to keep: T1 = %0.2f%%, T2 = %0.2f%%, S1 = %0.2f%%, S2 = %0.2f%%\n', ...
-        sum(BIN.flag_T1==0)/sum(~isnan(BIN.depth))*100,...
-        sum(BIN.flag_T2==0)/sum(~isnan(BIN.depth))*100,...
-        sum(BIN.flag_S1==0)/sum(~isnan(BIN.depth))*100,...
-        sum(BIN.flag_S2==0)/sum(~isnan(BIN.depth))*100);
+    fprintf('Percentage of data kept: T1 = %0.2f%%, T2 = %0.2f%%, S1 = %0.2f%%, S2 = %0.2f%%\n', ...
+        flagT1/length(BIN.depth)*100,flagT2/length(BIN.depth)*100,flagsh1/length(BIN.depth)*100,flagsh2/length(BIN.depth)*100)
      disp('************************************')
     %% Additional variables: K-OsbornCox and Ozmidov length scale
     BIN.KOsborn_S1 = 0.2*BIN.eps_S1.*(BIN.N2).^-1; % Gamma = 0.2

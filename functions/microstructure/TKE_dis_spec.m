@@ -29,6 +29,8 @@ function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU]=TKE_dis_spec(pres,x0,px0,k1,k2
 % kL: Lower integration wavenumber (cpm)
 % kU: Upper integration wavenumber (cpm)
 
+% Last version: 12.01.2026
+
 %% Initialization
 eps_S=NaN;kK=NaN;epsN=NaN;kKN=NaN;
 
@@ -59,12 +61,16 @@ if isempty(x) |  sum(x==0)==length(pres)
 end
 
 %% Spatial resolution of the time series (cpm), FFT length and overlapping
-Fs=length(pres)./ (max(pres)-min(pres));
+Fs=length(pres)./ (max(pres)-min(pres)); % Mean sampling rate in pressure space [number of samples/dbar] 
+% FFT segment length (number of samples) if not specified (half the bin by
+% default):
 if sL == 0
-    sL = round(length(x(:,1))/2)-1;
+    sL = round(length(x(:,1))/2)-1; 
 end
+% Number of samples shared between overlapping segments if not specified
+% (50 % overlap by default)
 if sOV == 0
-    sOV = round(sL/2);
+    sOV = round(sL/2); 
 end
 
 %% Degrees of freedom and MAD threshold
@@ -101,11 +107,15 @@ if k(2)<k2
                 % Goodman denoising if only 1 sh is available.
                 % These functions are provided by RSI in the ODAS libraries.
                 % Alternatively, pwelch can be used obtaining comparable results.
+
+                % Auto-spectrum of vibration signal:
                 [PSDps, ~] = csd_odas(px,px,sL,Fs,[],sOV,'linear');
+
+                % Cross-spectrum of vibration and shear;
                 [CPS, ~, ~, ~] = csd_matrix_odas(x,px,sL,Fs,[],sOV,'linear');
                 %                 [PSDps, ~] = pwelch(px-nanmean(px),hann(sL),sOV,sL,Fs,'onesided');
                 %                 [CPS, ~] = cpsd(x-nanmean(x),px-nanmean(px),hann(sL),sOV,sL,Fs,'onesided');
-                H = CPS./PSDps;
+                H = CPS./PSDps; % Spectral density ratio
                 PSDcont = abs(H).^2.*PSDps;
                 PSD = PSD0 - PSDcont;
             else
