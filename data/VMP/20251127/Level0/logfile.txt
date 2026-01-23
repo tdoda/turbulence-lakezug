@@ -1,0 +1,12 @@
+69281c7f 0b 0000 VMP001.p --- Thu Nov 27 09:40:15 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+69281c8a 0c 0001 VMP001.p --- Thu Nov 27 09:40:26 2025 UTC - "acquisition stop" manual stop
+69281d8d 0b 0000 VMP002.p --- Thu Nov 27 09:44:45 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+6928213f 0c 03b4 VMP002.p --- Thu Nov 27 10:00:31 2025 UTC - "acquisition stop" manual stop
+692824c2 0b 0000 VMP003.p --- Thu Nov 27 10:15:30 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+69282849 0c 0387 VMP003.p --- Thu Nov 27 10:30:33 2025 UTC - "acquisition stop" manual stop
+6928397d 0b 0000 VMP004.p --- Thu Nov 27 11:43:57 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+69283c22 0c 02a6 VMP004.p --- Thu Nov 27 11:55:14 2025 UTC - "acquisition stop" manual stop
+69284000 0b 0000 VMP005.p --- Thu Nov 27 12:11:44 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+692842d5 0c 02d6 VMP005.p --- Thu Nov 27 12:23:49 2025 UTC - "acquisition stop" manual stop
+6928462f 0b 0000 VMP006.p --- Thu Nov 27 12:38:07 2025 UTC - "acquisition start" Setup File:'C:/Users/delladmin/Desktop/Zugersee/20251126_vmp/20251127/setup_EAWAG_Zug_2025_11_27.cfg'
+692848c9 0c 029b VMP006.p --- Thu Nov 27 12:49:13 2025 UTC - "acquisition stop" manual stop
