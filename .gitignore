@@ -344,6 +344,8 @@ tags
 *.nc
 *.fig
 *.png
+*.svg
+*.eps
 #data/**/*.fig
 #data/**/*.png
 #data/**/*.mat
