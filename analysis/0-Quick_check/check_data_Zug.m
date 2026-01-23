@@ -8,11 +8,11 @@ clc
 %% Parameters to adapt
 % Campain
 lakename='Zug'; % Options: 'Zug' or 'default' (see load_parameters_Zug function)
-instrument='VMP'; % Options: 'VMP' or 'microCTD'
-direction = 'down'; % Direction of the profile, options: 'up' and 'down'
-general_data_folder='..\..\data\VMP\'; % Where fieldwork data is stored
+%instrument='VMP'; % Options: 'VMP' or 'microCTD'
+%direction = 'down'; % Direction of the profile, options: 'up' and 'down'
+general_data_folder='..\..\data\microCTD\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\';
-date_campaign="20250211"; % Should match the date in "load_parameters" function except if "default" is used
+date_campaign="20260113"; % Should match the date in "load_parameters" function except if "default" is used
 cfg_file=''; % Configuration file located in the data folder, if not specified in the parameters
 
 savefig=true; % If true: save figure
@@ -26,8 +26,8 @@ addpath(odas_folder)
 addpath("..\..\functions\microstructure\") % Add microstructure functions
 
 %% Load metadata
-param=load_parameters_Zug(lakename,date_campaign,general_data_folder,direction,instrument);
-param.filename_list={'VMP007'};
+param=load_parameters_Zug(lakename,date_campaign,general_data_folder);
+param.filename_list={'DAT_059'};
 
 if ~isfield(param,'cfgfile') || strcmp(param.cfgfile,'')
     if exist('cfg_file','var')
@@ -54,6 +54,8 @@ for kf=1:length(param.filename_list)
 
 
     if analyze_raw==2 % Load raw data
+
+        % 0. Add a step to modify config file (if needed)
     
         % 1. Conversion to physical units
         default_parameters=odas_p2mat;
@@ -66,7 +68,7 @@ for kf=1:length(param.filename_list)
         data_prof.tdate_fast=datetime(data_prof.tnum_fast,'ConvertFrom','datenum');  
 
         % Salinity
-        if strcmp(instrument,'VMP')
+        if strcmp(param.instrument,'VMP')
             warning('Salinity calculation might be incorrect')
         end
         data_prof.Salin = salinity(data_prof.P_slow, data_prof.(param.CTD_T), data_prof.(param.CTD_C));
@@ -337,9 +339,11 @@ if ~simple_prof
     
             % Az
             axprof9=subplot(2,5,10);
-            plot(data_fast.Az,data_fast.depth_fast,'color','k')
-            xlabel('Az [m.s^{-2}]')
-            set(axprof9,'ydir','reverse')
+            if isfield(data_fast,'Az')   
+                plot(data_fast.Az,data_fast.depth_fast,'color','k')
+                xlabel('Az [m.s^{-2}]')
+                set(axprof9,'ydir','reverse')
+            end
             linkaxes([axprof1,axprof1_top,axprof2,axprof2_top,axprof3,axprof3_top,...
                 axprof4,axprof4_top,axprof5,axprof5_top,axprof6,axprof6_top,...
                 axprof7,axprof7_top,axprof8,axprof8_top,axprof9],'y');
