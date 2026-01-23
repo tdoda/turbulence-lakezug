@@ -340,9 +340,10 @@ tags
 # Large data files
 *.p
 *.P
-*.mat
-*.nc
-*.fig
-*.png
-#data/**/*.fig
-#data/**/*.png
+#*.mat
+#*.nc
+#*.fig
+#*.png
+data/**/*.fig
+data/**/*.png
+data/**/*.mat
