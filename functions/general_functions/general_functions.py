@@ -273,6 +273,8 @@ def grad_order(x,f,order=1):
     
     return dfdx
 
+    
+#%%############################################################################
 def export_netCDF(filename,general_attributes,dimensions,variables,data):
     """Function export_netCDF
 
@@ -291,48 +293,145 @@ def export_netCDF(filename,general_attributes,dimensions,variables,data):
     Outputs: None
     
     """
-
-    nc_file = nc.Dataset(filename, mode='w', format='NETCDF4')
-    #nc_file = create_netCDF(filename)
-
-    for key in general_attributes:
-        setattr(nc_file, key, general_attributes[key])
-        
-    for key, values in dimensions.items():
-         nc_file.createDimension(values['dim_name'], values['dim_size'])
-
-
-    for key, values in variables.items(): 
-        if 'var_type' not in values.keys() or values["var_type"]=="float":
-            var = nc_file.createVariable(values["var_name"], np.float64, values["dim"], fill_value=np.nan)
-        elif values["var_type"]=="str":
-            var = nc_file.createVariable(values["var_name"], str, values["dim"])
-        else:
-            raise Exception("Variable type is unknown")
-        
-        var.units = values["unit"]
-        var.long_name = values["longname"]
-        if key in data.keys():
-            if 'var_type' not in values.keys() or values["var_type"]=="float":
-                var[:] = data[key]
-            else:
-                for k in range(len(data[key])):
-                    var[k]=data[key][k]
-        else:
-            raise Exception("Data is missing for {}".format(key))
-    nc_file.close()
-    print("Data exported to netCDF!")
+    with nc.Dataset(filename, mode='w', format='NETCDF4') as nc_file:
+        for key in general_attributes:
+            setattr(nc_file, key, general_attributes[key])
+            
+        for key, values in dimensions.items():
+             nc_file.createDimension(values['dim_name'], values['dim_size'])
     
-def read_netCDF_xr(pathname,rootpath='C:/Users/tdoda'):
-    """Function read_netCDF_xr
+    
+        for key, values in variables.items(): 
+            if 'var_type' not in values.keys() or values["var_type"]=="float":
+                var = nc_file.createVariable(values["var_name"], np.float64, values["dim"], fill_value=np.nan)
+            elif values["var_type"]=="str":
+                var = nc_file.createVariable(values["var_name"], str, values["dim"])
+            else:
+                raise Exception("Variable type is unknown")
+            
+            if "unit" in values:
+                var.units = values["unit"]
+            else: 
+                var.units = values["units"]
+                
+            if "longname" in values:
+                var.long_name = values["longname"]
+            else:  
+                var.long_name = values["long_name"]
+                
+            if key in data.keys():
+                if 'var_type' not in values.keys() or values["var_type"]=="float":
+                    var[:] = data[key]
+                else:
+                    for k in range(len(data[key])):
+                        var[k]=data[key][k]
+            else:
+                raise Exception("Data is missing for {}".format(key))
 
-    Read a netCDF file as an xarray, working even if the path contains non-ASCII characters
+    print("Data exported to netCDF!")
+
+#%%############################################################################   
+def read_netCDF(pathname):
+    """Function read_netCDF
+
+    Read a netCDF file with the netCDF4 package and convert it to a dictionary.
 
     Inputs:
     ----------
     pathname (string): netCDF filename with path included
-    rootpath (string): basic path without accent (typically C:/Users/username)
     
+        
+    Outputs:
+    ----------
+    nc_data (dictionary): dataset as a dictionary of numpy arrays
+    nc_genatt (dictionary): general attributes
+    nc_varatt (dictionary): variable attributes
+    nc_dim (dictionary): variable dimensions
+    """
+    
+    with nc.Dataset(pathname, 'r') as nc_obj:
+        nc_data, nc_genatt, nc_varatt, nc_dim=netCDF2dict(nc_obj)
+
+    
+    return nc_data, nc_genatt, nc_varatt, nc_dim
+
+#%%############################################################################
+def netCDF2dict(nc):
+    """Function netCDF2dict
+
+    Converts a netCDF object to a dictionary
+    
+    """
+    nc_data=dict()
+    nc_genatt=dict()
+    nc_varatt=dict()
+    nc_dim=dict()
+
+    for key,value in nc.variables.items():
+        if value.dtype==np.float64:
+            nc_data[key]=value[:].data
+        else:
+            nc_data[key]=value[:]
+        nc_varatt[key]=dict()
+        nc_varatt[key]["var_name"]=key
+        for att in value.ncattrs():     
+            nc_varatt[key][att]=getattr(value,att)
+        nc_varatt[key]["dim"]=value.dimensions
+            
+    for dim_name in nc.dimensions.keys():
+        nc_dim[dim_name]={"dim_name":nc.dimensions[dim_name].name,"dim_size":nc.dimensions[dim_name].size}
+            
+
+    for att in nc.ncattrs():
+        nc_genatt[att]=getattr(nc,att)
+
+                
+    return nc_data, nc_genatt, nc_varatt, nc_dim
+
+#%%############################################################################
+def ncdicts_to_xarray(nc_data, nc_genatt, nc_varatt, nc_dim):
+    """
+    Convert netCDF dictionaries (from netCDF2dict) to an xarray.Dataset
+    equivalent to xr.open_dataset()
+    """
+
+    data_vars = {}
+    coords = {}
+
+    # Loop over all variables
+    for var_name, data in nc_data.items():
+        var_info = nc_varatt[var_name]
+        dims = var_info["dim"]
+
+        # Variable attributes (exclude internal keys)
+        attrs = {
+            k: v for k, v in var_info.items()
+            if k not in ["var_name", "dim"]
+        }
+
+        # Coordinate variable if its name matches a dimension
+        if len(dims) == 1 and dims[0] == var_name:
+            coords[var_name] = (dims, data, attrs)
+        else:
+            data_vars[var_name] = (dims, data, attrs)
+
+    # Create dataset
+    ds = xr.Dataset(
+        data_vars=data_vars,
+        coords=coords,
+        attrs=nc_genatt
+    )
+
+    return ds
+#%%############################################################################
+def read_netCDF_xr(pathname):
+    """Function read_netCDF_xr
+
+    Read a netCDF file as an xarray by converting it to dictionaries first, working for relative or absolute paths without non-ASCII characters 
+
+    Inputs:
+    ----------
+    pathname (string): netCDF filename with path included
         
     Outputs:
     ----------
@@ -340,145 +439,13 @@ def read_netCDF_xr(pathname,rootpath='C:/Users/tdoda'):
     
     """
     
-    # Get the file name
-    ind_slash=pathname.rfind("/")
-    ind_backslash=pathname.rfind("\\")
-    ind_filename=max(ind_slash,ind_backslash)
-    if ind_filename>=0:
-        filename=pathname[ind_filename+1:]
-    else:
-        filename=pathname
-    
-    
-    # current_path=os.getcwd()
-    # source_path=os.path.join(current_path, pathname)
-    
-    destination_path = os.path.join(rootpath, filename)  # Full path for the destination file
+    nc_data, nc_genatt, nc_varatt, nc_dim = read_netCDF(pathname)
 
-    # Copy the file 
-    try:
-        shutil.copy(pathname, destination_path)
-    except Exception as e:
-        print(f"Error copying file: {e}")
-        
-    # Open file
-    data_xr=xr.open_dataset(destination_path)
-    data_xr.close() # Close the file
-    data_xr=data_xr.load() # Load data into memory to be independent of teh file
-    
-    # Delete file
-    os.remove(destination_path)
+    data_xr = ncdicts_to_xarray(nc_data, nc_genatt, nc_varatt, nc_dim)
     
     return data_xr
 
-def create_netCDF(pathname,mode_name='w', format_name='NETCDF4', rootpath='C:/Users/tdoda'):
-    """Function create_netCDF_xr
-
-    Create a netCDF file even if the path contains non-ASCII characters.
-
-    Inputs:
-    ----------
-    pathname (string): netCDF filename with path included
-    mode_name
-    format_name
-    rootpath (string): basic path without accent (typically C:/Users/username)
-    
-        
-    Outputs:
-    ----------
-    nc_file (netCDF object): netCDF dataset
-    
-    """
-    
-    # Get the file name
-    ind_slash=pathname.rfind("/")
-    ind_backslash=pathname.rfind("\\")
-    ind_filename=max(ind_slash,ind_backslash)
-    if ind_filename>=0:
-        filename=pathname[ind_filename+1:]
-    else:
-        filename=pathname
-    
-    
-    # current_path=os.getcwd()
-    # source_path=os.path.join(current_path, pathname)
-    
-    destination_path = os.path.join(rootpath, filename)  # Full path for the destination file
-    
-    # Create netCDF file there
-    nc_file = nc.Dataset(destination_path, mode=mode_name, format=format_name)
-    
-    return nc_file
-
-def close_netCDF(nc_file,pathname,rootpath=r'C:/Users/tdoda'):
-    """Function create_netCDF_xr
-
-    Closed an open netCDF file created with create_netCDF() and save it in the path containing non-ASCII characters.
-
-    Inputs:
-    ----------
-    nc_file (netCDF object): netCDF dataset
-    pathname (string): netCDF filename with path included (where to save it)
-    rootpath (string): basic path without accent (typically C:/Users/username)
-    
-        
-    Outputs:
-    ----------
-    None
-    """
-    # Close the file
-    nc_file.close()
-    
-    # Get the file name
-    ind_slash=pathname.rfind("/")
-    ind_backslash=pathname.rfind("\\")
-    ind_filename=max(ind_slash,ind_backslash)
-    if ind_filename>=0:
-        filename=pathname[ind_filename+1:]
-    else:
-        filename=pathname
-    
-    current_path = os.path.join(rootpath, filename)  # Full path where the file has been created
-    
-    if not os.path.exists(current_path):
-        raise Exception("File does not exist")
-    
-    # Copy the file 
-    try:
-        shutil.copy(current_path,pathname)
-    except Exception as e:
-        print(f"Error copying file: {e}")
-        
-    
-    # Delete file
-    os.remove(current_path)
-
-def netCDF2dict(nc):
-    """Function netCDF2dict
-
-    Converts a netCDF object to a dictionary
-    
-    """
-    
-    nc_data=dict()
-    nc_genatt=dict()
-    nc_varatt=dict()
-    
-    for key,value in nc.variables.items():
-        if value.dtype==np.float64:
-            nc_data[key]=value[:].data
-        else:
-            nc_data[key]=value[:]
-        nc_varatt[key]=dict()
-        for att in value.ncattrs():
-            nc_varatt[key][att]=getattr(value,att)
-
-    for att in nc.ncattrs():
-        nc_genatt[att]=getattr(nc,att)
-
-                
-    return nc_data, nc_genatt, nc_varatt
-
+#%%############################################################################
 def dist_transect(xpt,ypt,xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',method='projected'):
     """Function dist_transect
 
@@ -565,19 +532,28 @@ def bathy_transect(x,y,D,xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',dx=1):
     return xbathy,ybathy,dist_bathy,depth_bathy
 
 
-def matstruct2dict(mat_struct):
+def matstruct2dict(mat_struct,prefix_varname=''):
     """Function matstruct2dict
 
     Converts Matlab structures into dictionary
     
+    Inputs:
+    ----------
+    mat_struct (Matlab structure object): data stored as a Matlab object
+    prefix_varname (string) [optional]: prefix to add to each key of D. Default: no prefix.
+        
+    Outputs:
+    ----------
+    D (dictionary): data stored as a dictionary
     """
     key_names=list(dir(mat_struct))
     D=dict()
     for key in key_names:
         if key[0]!="_":
-            D[key]=getattr(mat_struct,key)
+            D[prefix_varname+key]=getattr(mat_struct,key)
 
     return D
+
     
 
 
