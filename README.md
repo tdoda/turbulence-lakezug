@@ -6,8 +6,6 @@ This repository contains the data and scripts related to turbulence measurements
 
 Link to the remote repository: https://github.com/tdoda/turbulence-lakezug.git
 
-This is a test.
-
 ## Sensors
 ### VMP profiler
 
