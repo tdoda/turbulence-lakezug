@@ -32,7 +32,7 @@ addpath("..\..\functions\microstructure\") % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder);
 %param=load_parameters_Geneva(lakename,date_campaign,general_data_folder);
-%param.filename_list={'DAT_059'};
+param.filename_list={'DAT_059'};
 
 if modify_cfg 
     if (~isfield(param,'cfgfile') || strcmp(param.cfgfile,''))
