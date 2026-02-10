@@ -45,6 +45,7 @@ for kf=1:length(param.filename_list)
     disp(' ')
     disp("***********************")
     fprintf("File %s (%d/%d)\n",param.filename_list{kf},kf,length(param.filename_list))
+    
     output_data_file=[data_folder,'\data_',param.filename_list{kf},'.mat'];
     if exist(output_data_file,'file')
         analyze_raw=input(sprintf('Mat file already exists for %s: load it (1) or re-analyze the data (2)?',param.filename_list{kf}));

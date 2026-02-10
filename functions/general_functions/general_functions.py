@@ -554,6 +554,62 @@ def matstruct2dict(mat_struct,prefix_varname=''):
 
     return D
 
-    
+def read_bathy(datafolder,datafiles,lake_elev):
+    """Function read_bathy
 
+    Reads *.asc bathymetry files and combine them into a xarray.
+    
+    Inputs:
+    ----------
+    datafolder (string): folder name where the bathymetry data is stored
+    datafiles (list): list of bathymetry *.asc files
+    lake_evel (float): elevation of the lake surface [m]
+    
+        
+    Outputs:
+    ----------
+    depth_xr (xarray): depth grid stored as an xarray
+    """
+    x_list=[]
+    y_list=[]
+    x_min=[]
+    x_max=[]
+    y_min=[]
+    y_max=[]
+    depth_list=[]
+    
+    for filename in datafiles:
+        with open(os.path.join(datafolder,filename)) as f:
+            header = {line.split()[0]: float(line.split()[1]) for line in [next(f) for _ in range(6)]}
+            data=np.loadtxt(f)
+        nodata = header["nodata_value"]
+        data[data == nodata] = np.nan # Elevation data
+        depth_data=lake_elev-data
+        depth_data[depth_data<0]=np.nan
+        depth_list.append(depth_data)
+        x_min.append(header["xllcorner"])
+        x_max.append(header["xllcorner"] + header["cellsize"] * header["ncols"])
+        y_min.append(header["yllcorner"])
+        y_max.append(header["yllcorner"] + header["cellsize"] * header["nrows"])
+        x_list.append(header["xllcorner"] + header["cellsize"] * (np.arange(header["ncols"])))
+        y_list.append(header["yllcorner"] +header["cellsize"] * (np.arange(header["nrows"])[::-1]))
+    
+    #%% Create a single array of bathymetry data
+    x_grid=np.arange(np.min(np.array(x_min)),np.max(np.array(x_max)),header["cellsize"])
+    y_grid=np.arange(np.min(np.array(y_min)),np.max(np.array(y_max)),header["cellsize"])
+    depth_grid = np.full((len(y_grid), len(x_grid)), np.nan)
+    
+    for kf in range(len(depth_list)):
+        ind_row=np.where(np.isin(y_grid, y_list[kf]))[0]
+        ind_col=np.where(np.isin(x_grid, x_list[kf]))[0]
+    
+        depth_grid[np.ix_(ind_row, ind_col)] = np.flipud(depth_list[kf]) # Reverse row indices to increase with y values
+    
+    depth_xr = xr.DataArray(
+        depth_grid,
+        coords={"y": y_grid, "x": x_grid},
+        dims=("y", "x")
+    )   
+
+    return depth_xr
 

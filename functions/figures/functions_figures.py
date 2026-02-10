@@ -48,13 +48,15 @@ def get_cmap_discrete(cmap_name,n):
             
     return mcol.ListedColormap(colprof)
 
-def compute_logmedian(DATA,cell_size,varname,ind_file=np.nan,fieldname="BINNED"):
-    """Function compute_logmedian
+def compute_logmedian_dict(DATA,cell_size,varname,ind_file=np.nan,fieldname="BINNED"):
+    """Function compute_logmedian_dict
+    
+    DATA: dictionary
 
-   ind_file and fieldname are optional
+    ind_file and fieldname are optional
 
-   Returns median of the log of the variable between cell depth (i-1) and cell
-   depth i
+    Returns median of the log of the variable between cell depth (i-1) and cell
+    depth i
    
     
      """
@@ -82,6 +84,44 @@ def compute_logmedian(DATA,cell_size,varname,ind_file=np.nan,fieldname="BINNED")
     depth_end=np.arange(cell_size,np.nanmax(depth_allprof),cell_size)
     depth_cells=np.sort(np.concatenate((depth_start,depth_end))) 
     logmed_cells=np.full(depth_cells.shape,np.nan) 
+    for k in range(len(depth_start)):
+        indcell=np.where(depth_cells==depth_start[k])[0][-1]
+        data_cell=var_allprof[(depth_allprof>=depth_start[k])&(depth_allprof<depth_end[k])]
+        data_cell[data_cell<=0]=np.nan # Remove non positive values for log calculation
+        if len(data_cell[~np.isnan(data_cell)])>0:
+            logmed_cells[indcell:indcell+2]=np.nanmedian(np.log10(data_cell)) 
+
+    return depth_allprof,var_allprof,depth_cells,logmed_cells
+
+def compute_logmedian_list(depth_list,var_list,cell_size):
+    """Function compute_logmedian_list
+    
+    var_list: list containing already the variable data
+    cell_size in meters
+
+    Returns median of the log of the variable between cell depth (i-1) and cell
+    depth i
+   
+    
+     """
+ 
+    # Combine the data
+    var_allprof=np.array([])
+    depth_allprof=np.array([])
+    
+
+    for kprof in range(len(var_list)): 
+        datavar=var_list[kprof] 
+        var_allprof=np.concatenate((var_allprof,datavar[~np.isnan(datavar)]))
+        depth_allprof=np.concatenate((depth_allprof,depth_list[kprof][~np.isnan(datavar)])) 
+        
+            
+    #Compute the median of the log
+    depth_start=np.arange(0,np.nanmax(depth_allprof)-cell_size ,cell_size)
+    depth_end=np.arange(cell_size,np.nanmax(depth_allprof),cell_size)
+    depth_cells=np.sort(np.concatenate((depth_start,depth_end))) 
+    logmed_cells=np.full(depth_cells.shape,np.nan) 
+
     for k in range(len(depth_start)):
         indcell=np.where(depth_cells==depth_start[k])[0][-1]
         data_cell=var_allprof[(depth_allprof>=depth_start[k])&(depth_allprof<depth_end[k])]

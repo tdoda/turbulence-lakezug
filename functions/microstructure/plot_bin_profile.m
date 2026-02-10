@@ -65,15 +65,15 @@ leg_entries={};
 if param.config.T1
     plot(BIN.eps_T1,BIN.pressure,'.-','linewidth',1,'markersize',4)
     hold on
-    plot(BIN.eps_T1(BIN.flag_T1==0),BIN.pressure(BIN.flag_T1==0),'ob','markersize',3)
-    leg_entries(end+1:end+2)={'T01','T01_flagged'};
+    plot(BIN.eps_T1(BIN.flag_T1==1),BIN.pressure(BIN.flag_T1==1),'ob','markersize',3) % Flagged = bad data
+    leg_entries(end+1:end+2)={'T01','T01_{flagged}'};
 end
 
 if param.config.T2
     plot(BIN.eps_T2,BIN.pressure,'.-','linewidth',1,'markersize',4)
     hold on
-    plot(BIN.eps_T2(BIN.flag_T2==0),BIN.pressure(BIN.flag_T2==0),'or','markersize',3)
-    leg_entries(end+1:end+2)={'T02','T02_flagged'};
+    plot(BIN.eps_T2(BIN.flag_T2==1),BIN.pressure(BIN.flag_T2==1),'or','markersize',3) % Flagged = bad data
+    leg_entries(end+1:end+2)={'T02','T02_{flagged}'};
 end
 
 if param.config.S1
