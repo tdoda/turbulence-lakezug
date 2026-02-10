@@ -1,4 +1,4 @@
-function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU, SPECTRUM]=TKE_dis_spec(pres,x0,px0,k1,k2,fn,visco,W,sL,sOV,noise_corr,sh_number,plt,presplt,Tplt)
+function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU]=TKE_dis_spec(pres,x0,px0,k1,k2,fn,visco,W,sL,sOV,noise_corr,sh_number,plt,presplt,Tplt)
 
 % GOAL
 % Estimate of TKE dissipation rate eps_S by integration of the measured
@@ -28,11 +28,8 @@ function [eps_S, MAD_S, MADc, fit_flag_S, kL, kU, SPECTRUM]=TKE_dis_spec(pres,x0
 % fit_flag_S: acceptance flag according to quality metrics: 0 rejected, 1 accepted
 % kL: Lower integration wavenumber (cpm)
 % kU: Upper integration wavenumber (cpm)
-% SPECTRUM: structure array containing all information to plot the spectra
-% [added by T. Doda, 10.02.2026]
 
-
-% Last version: 10.02.2026
+% Last version: 12.01.2026
 
 %% Initialization
 eps_S=NaN;kK=NaN;epsN=NaN;kKN=NaN;
@@ -226,15 +223,39 @@ if k(2)<k2
     end
 
     %% Export spectra information (T. Doda, 10.02.2026)
+    SPECTRUM.k0=k0; % All wavenumbers
+    SPECTRUM.k=k; % Wavenumbers up to the maximum wavenumber specified from the anti-aliasing filter f_AA (fn)
+    SPECTRUM.PSD_raw=PSD_raw; % Initial spectrum (all wavenumbers)
+    SPECTRUM.PSD0=PSD0; % Spectrum corrected for time response (all wavenumbers)
+    SPECTRUM.PSD=PSD; % Spectrum corrected for time response over k
+    SPECTRUM.ind_fit=ikfit; % Indices of wavenumbers used for fitting, from max([kS, kuK]) to upper wavenumber defined from signal-to-noise ratio
+    SPECTRUM.PSD_theo=Tspec(Tdis, Xi_T, kB,k0,D,q); % Theoretical spectrum (all wavenumbers)
+    SPECTRUM.Sm=Sm; % Exponential fitted PSD over k
+    SPECTRUM.Sn0=Sn0; % Noise spectrum corrected for time response (all wavenumbers)
+    SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
+    SPECTRUM.H=H; % Time response correction parameters over k
+    SPECTRUM.H_lim=H_lim; % Maximal value of H
+
+    
+
+    % Wavenumbers
     SPECTRUM.k      = k;        % Wavenumbers used for the shear spectrum
     SPECTRUM.k_fit  = k(1:ik3); % Wavenumbers used for fitting
-    SPECTRUM.PSD0   = PSD0;     % Raw / corrected-for-response shear spectrum
+    
+    % Spectra
+    SPECTRUM_.PSD0   = PSD0;     % Raw / corrected-for-response shear spectrum
     SPECTRUM.PSD    = PSD;      % Denoised shear spectrum
     SPECTRUM.PSD_fit= PSD(1:ik3); % PSD used in fit
-    SPECTRUM.PSD_theo    = NAS;      % Nasmyth spectrum (iteration result)
-    SPECTRUM.kK     = kK;       % Kolmogorov wavenumber
-    SPECTRUM.k_AA   = fn/W;     % Anti-aliasing cutoff
-    SPECTRUM.k_lim  = 150;      % Hard upper k-limit used in plot
+    
+    % Theoretical / fitted spectrum
+    SPECTRUM_SHEAR.PSD_theo    = NAS;      % Nasmyth spectrum (iteration result)
+    
+    % Key wavenumbers / markers
+    SPECTRUM_SHEAR.kK     = kK;       % Kolmogorov wavenumber
+    SPECTRUM_SHEAR.k_AA   = fn/W;     % Anti-aliasing cutoff
+    SPECTRUM_SHEAR.k_lim  = 150;      % Hard upper k-limit used in plot
+    
+    
     
     %% Plots
     if plt~=0        

@@ -373,7 +373,7 @@ if cont
     SPECTRUM.PSD0=PSD0; % Spectrum corrected for time response (all wavenumbers)
     SPECTRUM.PSD=PSD; % Spectrum corrected for time response over k
     SPECTRUM.ind_fit=ikfit; % Indices of wavenumbers used for fitting, from max([kS, kuK]) to upper wavenumber defined from signal-to-noise ratio
-    SPECTRUM.PSD_theo=Tspec(Tdis, Xi_T, kB,k0,D,q); % Theoretica spectrum (all wavenumbers)
+    SPECTRUM.PSD_theo=Tspec(Tdis, Xi_T, kB,k0,D,q); % Theoretical spectrum (all wavenumbers)
     SPECTRUM.Sm=Sm; % Exponential fitted PSD over k
     SPECTRUM.Sn0=Sn0; % Noise spectrum corrected for time response (all wavenumbers)
     SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
