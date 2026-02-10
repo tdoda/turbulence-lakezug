@@ -4,7 +4,7 @@
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\..\functions\figures'))
-from functions_figures import array_bands, get_cmap_discrete, compute_logmedian
+from functions_figures import array_bands, get_cmap_discrete, compute_logmedian_list
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\..\functions\ctd'))
 from functions_ctd import thorpe_scale
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\..\functions\general_functions'))
@@ -28,8 +28,19 @@ datalevel='Level2'
 data_folder_rel=os.path.join('..','..','..','data','microCTD',campaign_name,datalevel)
 
 #folder_param_name='down1.0_K5.3_L_NAS0.0058_singlepole_nfft3_EPFL_Goodman'
-fileprof=['DAT_059_down_prof1','DAT_059_down_prof2'] # all files
-profnames=['VMPC1','VMPC2']
+fileprof=['DAT_053_down_prof1','DAT_053_down_prof2','DAT_053_down_prof3',
+          'DAT_055_down_prof1','DAT_055_down_prof2','DAT_055_down_prof3',
+          'DAT_057_down_prof1','DAT_057_down_prof2','DAT_057_down_prof3',
+          'DAT_059_down_prof1','DAT_059_down_prof2'] # all files
+profnames=['VMPS','VMPS','VMPS',
+           'VMPC1','VMPC1','VMPC1',
+           'VMPW','VMPW','VMPW',
+           'VMPC2','VMPC2']
+
+indS=np.where(np.array(profnames)=='VMPS')[0]
+indC1=np.where(np.array(profnames)=='VMPC1')[0]
+indW=np.where(np.array(profnames)=='VMPW')[0]
+indC2=np.where(np.array(profnames)=='VMPC2')[0]
 
 savefig=True
 
@@ -50,7 +61,7 @@ for kf in range(len(fileprof)):
 
 
 
-#%% Check Thorpse length calculation in compare_profiles_mat
+#%% Check Thorpe length calculation in compare_profiles_mat
 
 #%% Figure profiles
 # Create a figure with specified size in centimeters
@@ -142,88 +153,116 @@ if savefig:
     fig.savefig('comparison_turbulence_'+campaign_name+'.svg',dpi=400)
 
 #%% Figure averaged turbulence
-# colC=[1, 0.4, 0.15]
-# colC_light=[1, 0.75, 0.6]
-# colS=[50/255,100/255,214/255]
-# colS_light=[140/255,170/255,230/255]
-# # Create a figure with specified size in centimeters
-# fig,ax = plt.subplots(1,4,figsize=(18 / 2.54, 9 / 2.54),sharey=True)  # Convert from cm to inches
+colC1=[1, 0.4, 0.15]
+colC1_light=[1, 0.75, 0.6]
+colW=[0.1, 0.6, 0.3]
+colW_light=[0.5,0.8,0.5]
+colS=[50/255,100/255,214/255]
+colS_light=[140/255,170/255,230/255]
+depthmax=120 # [m]
+depthcell=5 # [m]
 
-# # 1st subplot: Eps-T1
-# depthC_all, epsC_all, depthC_cells, logmed_epsC = compute_logmedian(DATA, 5, 'eps_T1', np.array([1, 2, 5]))
-# depthS_all, epsS_all, depthS_cells, logmed_epsS = compute_logmedian(DATA, 5, 'eps_T1', np.array([8]))
+# Create a figure with specified size in centimeters
+fig,ax = plt.subplots(1,4,figsize=(18 / 2.54, 10 / 2.54),sharey=True)  # Convert from cm to inches
 
-# # Plot the data
-# ax[0].plot(epsC_all, depthC_all, 'o', markersize=1, markeredgecolor=colC_light, markerfacecolor=colC_light,rasterized=True)
-# ax[0].plot(10**logmed_epsC, depthC_cells, '-', color=colC)
-# ax[0].plot(epsS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
-# ax[0].plot(10**logmed_epsS, depthS_cells, '-',color=colS)
-# ax[0].set_ylabel('Depth (m)')
-# ax[0].set_xlabel(r'$\epsilon$ (m$^2$ s$^{-3}$)')
-# ax[0].set_xscale('log')
-# xlimval=ax[0].get_xlim()
-# ax[0].set_xticks(10.0**np.arange(-14, 1, 2))
-# ax[1].set_xlim(xlimval)
-# ax[0].tick_params(axis='x', labelrotation=45)
-# ax[0].set_xlim([10**(-11), 10**(-4)])
+# 1st subplot: Thorpe-T1
+depthS_all, LTS_all, depthS_cells, logmed_LTS = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indS],[dataprof[i]["BINNED_LTuT1"].values for i in indS], depthcell)
+# depthC1_all, LTC1_all, depthC1_cells, logmed_LTC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC1],[dataprof[i]["BINNED_LTuT1"].values for i in indC1], depthcell)
+# depthC2_all, LTC2_all, depthC2_cells, logmed_LTC2 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC2],[dataprof[i]["BINNED_LTuT1"].values for i in indC2], depthcell)
+depthC1_all, LTC1_all, depthC1_cells, logmed_LTC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in np.concatenate((indC1,indC2))],[dataprof[i]["BINNED_LTuT1"].values for i in np.concatenate((indC1,indC2))], depthcell)
+depthW_all, LTW_all, depthW_cells, logmed_LTW = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indW],[dataprof[i]["BINNED_LTuT1"].values for i in indW], depthcell)
 
-# # 2nd subplot: X-T1
-# depthC_all, XiC_all, depthC_cells, logmed_XiC = compute_logmedian(DATA, 5, 'Xi_T1', np.array([1, 2, 5]))
-# depthS_all, XiS_all, depthS_cells, logmed_XiS = compute_logmedian(DATA, 5, 'Xi_T1', np.array([8]))
 
-# ax[1].plot(XiC_all, depthC_all, 'o', markersize=1, markeredgecolor=colC_light, markerfacecolor=colC_light,rasterized=True)
-# ax[1].plot(10**logmed_XiC, depthC_cells, '-', color=colC)
-# ax[1].plot(XiS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
-# ax[1].plot(10**logmed_XiS, depthS_cells, '-',color=colS)
-# ax[1].set_xlabel(r'$\chi$ (K$^2$ s$^{-1}$)')
-# ax[1].set_xscale('log')
-# xlimval=ax[1].get_xlim()
-# ax[1].set_xticks(10.0**np.arange(-14, 1, 2))
-# ax[1].set_xlim(xlimval)
-# ax[1].tick_params(axis='x', labelrotation=45)
-# ax[1].set_xlim([10**(-13), 10**(-6)])
+ax[0].plot(LTC1_all, depthC1_all, 'o', markersize=1, markeredgecolor=colC1_light, markerfacecolor=colC1_light,rasterized=True)
+ax[0].plot(LTS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
+ax[0].plot(LTW_all, depthW_all, 'o', markersize=1, markeredgecolor=colW_light, markerfacecolor=colW_light,rasterized=True)
+ax[0].plot(10**logmed_LTC1, depthC1_cells, '-', color=colC1)
+ax[0].plot(10**logmed_LTS, depthS_cells, '-',color=colS)
+ax[0].plot(10**logmed_LTW, depthW_cells, '-',color=colW)
+ax[0].set_ylabel('Depth (m)')
+ax[0].set_xlabel(r'$L_{T}$ (m)')
+ax[0].set_xscale('log')
+xlimval=ax[0].get_xlim()
+ax[0].set_xticks(10.0**np.arange(-14, 1, 2))
+ax[0].set_xlim(xlimval)
+ax[0].tick_params(axis='x', labelrotation=45)
 
-# # 3rd subplot: Kz-T1
-# depthC_all, KzC_all, depthC_cells, logmed_KzC = compute_logmedian(DATA, 5, 'KOsbornCox_T1', np.array([1, 2, 5]))
-# depthS_all, KzS_all, depthS_cells, logmed_KzS = compute_logmedian(DATA, 5, 'KOsbornCox_T1', np.array([8]))
+# 2nd subplot: Eps-T1
+depthS_all, epsS_all, depthS_cells, logmed_epsS = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indS],[dataprof[i]["BINNED_eps_T1"].values for i in indS], depthcell)
+# depthC1_all, epsC1_all, depthC1_cells, logmed_epsC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC1],[dataprof[i]["BINNED_eps_T1"].values for i in indC1], depthcell)
+# depthC2_all, epsC2_all, depthC2_cells, logmed_epsC2 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC2],[dataprof[i]["BINNED_eps_T1"].values for i in indC2], depthcell)
+depthC1_all, epsC1_all, depthC1_cells, logmed_epsC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in np.concatenate((indC1,indC2))],[dataprof[i]["BINNED_eps_T1"].values for i in np.concatenate((indC1,indC2))], depthcell)
+depthW_all, epsW_all, depthW_cells, logmed_epsW = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indW],[dataprof[i]["BINNED_eps_T1"].values for i in indW], depthcell)
 
-# ax[2].plot(KzC_all, depthC_all, 'o', markersize=1, markeredgecolor=colC_light, markerfacecolor=colC_light,rasterized=True)
-# ax[2].plot(10**logmed_KzC, depthC_cells, '-', color=colC)
-# ax[2].plot(KzS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
-# ax[2].plot(10**logmed_KzS, depthS_cells, '-',color=colS)
-# ax[2].set_xlabel(r'$K_{z}$ (m$^2$ s$^{-1}$)')
-# ax[2].set_xscale('log')
-# xlimval=ax[2].get_xlim()
-# ax[2].set_xticks(10.0**np.arange(-14, 1, 2))
-# ax[2].set_xlim(xlimval)
-# ax[2].tick_params(axis='x', labelrotation=45)
 
-# # 4th subplot: Thorpe-T1
-# # depthC_all, LtC_all, depthC_cells, logmed_LtC = compute_logmedian(DATA, 5, 'Lt', np.array([1, 2, 5]),fieldname='THORPE')
-# # depthS_all, LtS_all, depthS_cells, logmed_LtS = compute_logmedian(DATA, 5, 'Lt', np.array([8]),fieldname='THORPE')
-# # depthC_all, LtC_all, depthC_cells, logmed_LtC = compute_logmedian(DATA, 5, 'LTuT1', np.array([1, 2, 5]))
-# # depthS_all, LtS_all, depthS_cells, logmed_LtS = compute_logmedian(DATA, 5, 'LTuT1', np.array([8]))
-# depthC_all, LtC_all, depthC_cells, logmed_LtC = compute_logmedian(DATA, 5, 'thorpe_disp_abs', np.array([1, 2, 5]),fieldname='THORPE')
-# depthS_all, LtS_all, depthS_cells, logmed_LtS = compute_logmedian(DATA, 5, 'thorpe_disp_abs', np.array([8]),fieldname='THORPE')
+# Plot the data
+ax[1].plot(epsC1_all, depthC1_all, 'o', markersize=1, markeredgecolor=colC1_light, markerfacecolor=colC1_light,rasterized=True)
+ax[1].plot(epsS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
+ax[1].plot(epsW_all, depthW_all, 'o', markersize=1, markeredgecolor=colW_light, markerfacecolor=colW_light,rasterized=True)
+ax[1].plot(10**logmed_epsC1, depthC1_cells, '-', color=colC1)
+ax[1].plot(10**logmed_epsS, depthS_cells, '-',color=colS)
+ax[1].plot(10**logmed_epsW, depthW_cells, '-',color=colW)
 
-# ax[3].plot(LtC_all, depthC_all, 'o', markersize=1, markeredgecolor=colC_light, markerfacecolor=colC_light,rasterized=True)
-# ax[3].plot(10**logmed_LtC, depthC_cells, '-', color=colC)
-# ax[3].plot(LtS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
-# ax[3].plot(10**logmed_LtS, depthS_cells, '-',color=colS)
-# ax[3].set_xlabel(r'$d_{T}$ (m)')
-# ax[3].set_xscale('log')
-# xlimval=ax[3].get_xlim()
-# ax[3].set_xticks(10.0**np.arange(-14, 1, 2))
-# ax[3].set_xlim(xlimval)
-# ax[3].tick_params(axis='x', labelrotation=45)
+ax[1].set_xlabel(r'$\epsilon$ (m$^2$ s$^{-3}$)')
+ax[1].set_xscale('log')
+xlimval=ax[1].get_xlim()
+ax[1].set_xticks(10.0**np.arange(-14, 1, 2))
+ax[1].set_xlim(xlimval)
+ax[1].tick_params(axis='x', labelrotation=45)
+#ax[1].set_xlim([10**(-11), 10**(-4)])
 
-# ax[0].set_ylim((0,175))
-# ax[0].invert_yaxis()  # Reverse the y-axis (like MATLAB's `set(ax1,'ydir','reverse')`)
 
-# fig.set_tight_layout(True)
+# 3rd subplot: X-T1
+depthS_all, XiS_all, depthS_cells, logmed_XiS = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indS],[dataprof[i]["BINNED_Xi_T1"].values for i in indS], depthcell)
+# depthC1_all, XiC1_all, depthC1_cells, logmed_XiC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC1],[dataprof[i]["BINNED_Xi_T1"].values for i in indC1], depthcell)
+# depthC2_all, XiC2_all, depthC2_cells, logmed_XiC2 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC2],[dataprof[i]["BINNED_Xi_T1"].values for i in indC2], depthcell)
+depthC1_all, XiC1_all, depthC1_cells, logmed_XiC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in np.concatenate((indC1,indC2))],[dataprof[i]["BINNED_Xi_T1"].values for i in np.concatenate((indC1,indC2))], depthcell)
+depthW_all, XiW_all, depthW_cells, logmed_XiW = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indW],[dataprof[i]["BINNED_Xi_T1"].values for i in indW], depthcell)
 
-# # Save figure
 
-# if savefig:
-#     fig.savefig('comparison_turbulence_Python.png',dpi=400)
-#     fig.savefig('comparison_turbulence_Python.svg',dpi=1000)
+ax[2].plot(XiC1_all, depthC1_all, 'o', markersize=1, markeredgecolor=colC1_light, markerfacecolor=colC1_light,rasterized=True)
+ax[2].plot(XiS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
+ax[2].plot(XiW_all, depthW_all, 'o', markersize=1, markeredgecolor=colW_light, markerfacecolor=colW_light,rasterized=True)
+ax[2].plot(10**logmed_XiC1, depthC1_cells, '-', color=colC1)
+ax[2].plot(10**logmed_XiS, depthS_cells, '-',color=colS)
+ax[2].plot(10**logmed_XiW, depthW_cells, '-',color=colW)
+ax[2].set_xlabel(r'$\chi$ (K$^2$ s$^{-1}$)')
+ax[2].set_xscale('log')
+xlimval=ax[2].get_xlim()
+ax[2].set_xticks(10.0**np.arange(-14, 1, 2))
+ax[2].set_xlim(xlimval)
+ax[2].tick_params(axis='x', labelrotation=45)
+#ax[2].set_xlim([10**(-13), 10**(-6)])
+
+# 4th subplot: Kz-T1
+depthS_all, KzS_all, depthS_cells, logmed_KzS = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indS],[dataprof[i]["BINNED_KOsbornCox_T1"].values for i in indS], depthcell)
+# depthC1_all, KzC1_all, depthC1_cells, logmed_KzC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC1],[dataprof[i]["BINNED_KOsbornCox_T1"].values for i in indC1], depthcell)
+# depthC2_all, KzC2_all, depthC2_cells, logmed_KzC2 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indC2],[dataprof[i]["BINNED_KOsbornCox_T1"].values for i in indC2], depthcell)
+depthC1_all, KzC1_all, depthC1_cells, logmed_KzC1 = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in np.concatenate((indC1,indC2))],[dataprof[i]["BINNED_KOsbornCox_T1"].values for i in np.concatenate((indC1,indC2))], depthcell)
+depthW_all, KzW_all, depthW_cells, logmed_KzW = compute_logmedian_list([dataprof[i]["BINNED_depth"].values for i in indW],[dataprof[i]["BINNED_KOsbornCox_T1"].values for i in indW], depthcell)
+
+
+ax[3].plot(KzC1_all, depthC1_all, 'o', markersize=1, markeredgecolor=colC1_light, markerfacecolor=colC1_light,rasterized=True)
+ax[3].plot(KzS_all, depthS_all, 'o', markersize=1, markeredgecolor=colS_light, markerfacecolor=colS_light,rasterized=True)
+ax[3].plot(KzW_all, depthW_all, 'o', markersize=1, markeredgecolor=colW_light, markerfacecolor=colW_light,rasterized=True)
+ax[3].plot(10**logmed_KzC1, depthC1_cells, '-', color=colC1)
+ax[3].plot(10**logmed_KzS, depthS_cells, '-',color=colS)
+ax[3].plot(10**logmed_KzW, depthW_cells, '-',color=colW)
+ax[3].set_xlabel(r'$K_{z}$ (m$^2$ s$^{-1}$)')
+ax[3].set_xscale('log')
+xlimval=ax[3].get_xlim()
+ax[3].set_xticks(10.0**np.arange(-14, 1, 2))
+ax[3].set_xlim(xlimval)
+ax[3].tick_params(axis='x', labelrotation=45)
+
+
+ax[0].set_ylim((0,depthmax))
+ax[0].invert_yaxis()  # Reverse the y-axis 
+
+fig.set_tight_layout(True)
+
+# Save figure
+
+if savefig:
+    fig.savefig('comparison_turbulence_avg_'+campaign_name+'.png',dpi=400)
+    fig.savefig('comparison_turbulence_avg_'+campaign_name+'.svg',dpi=1000)
