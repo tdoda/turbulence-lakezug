@@ -8,6 +8,8 @@ import netCDF4 as nc
 import xarray as xr
 import shutil
 import copy
+from scipy.io import loadmat
+from scipy.io.matlab import mat_struct
 
 
 def read_Vemco(filename):
@@ -531,28 +533,94 @@ def bathy_transect(x,y,D,xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',dx=1):
     
     return xbathy,ybathy,dist_bathy,depth_bathy
 
-
-def matstruct2dict(mat_struct,prefix_varname=''):
-    """Function matstruct2dict
-
-    Converts Matlab structures into dictionary
-    
-    Inputs:
-    ----------
-    mat_struct (Matlab structure object): data stored as a Matlab object
-    prefix_varname (string) [optional]: prefix to add to each key of D. Default: no prefix.
-        
-    Outputs:
-    ----------
-    D (dictionary): data stored as a dictionary
+def read_matfile(filename):
     """
-    key_names=list(dir(mat_struct))
-    D=dict()
-    for key in key_names:
-        if key[0]!="_":
-            D[prefix_varname+key]=getattr(mat_struct,key)
+    Function read_matfile
 
-    return D
+    Reads a Matlab .mat file and converts it to a dictionary, including nested structures.
+    
+    Inputs:  
+        filename (string): name of the .mat file to be read 
+    
+    Outputs:
+        matdict (dictionary): data stored as a dictionary, including nested structures
+    """
+
+    datavar=loadmat(filename,squeeze_me=True, struct_as_record=False)
+    matdict=dict()
+    for key in datavar.keys():
+        if key[0]=="_": # Skip internal keys
+            continue
+        matdict[key]=matvar2dict(datavar[key])
+    return matdict
+
+# def matvar2dict(matvar,prefix_varname=''):
+#     """Function matvar2dict
+
+#     Converts Matlab variables into dictionaries for structures, lists for arrays of structures, and returns the input as is for other types of variables (e.g., numeric arrays, strings).
+    
+#     Inputs:
+#     ----------
+#     matvar (Matlab variable object or numpy array of Matlab variables): data stored as a Matlab object
+#     prefix_varname (string) [optional]: prefix to add to each key of D. Default: no prefix.
+        
+#     Outputs:
+#     ----------
+#     D (dictionary or list of dictionaries or other): data stored as a dictionary if matvar is a single structure, or a list of dictionaries if matvar is an array of structures
+#     """
+
+#     if isinstance(matvar, mat_struct): # Convert Matlab structure to dictionary
+#         key_names = matvar._fieldnames
+#         D=dict()
+#         for key in key_names:
+#             if key[0]!="_":
+#                 D[prefix_varname+key]=getattr(matvar,key)
+#     elif type(matvar)==np.ndarray and len(matvar)>0 and isinstance(matvar[0], mat_struct): # Array of structures
+#         D=list()
+#         for k in range(len(matvar)):
+#             key_names = matvar[k]._fieldnames
+#             d=dict()
+#             for key in key_names:
+#                 if key[0]!="_":
+#                     d[prefix_varname+key]=getattr(matvar[k],key)
+#             D.append(d)
+#     else: # Not a structure or an array of structures: return the input as is
+#         D=matvar
+
+#     return D
+
+def matvar2dict(matvar, prefix_varname=''):
+    """Function matvar2dict
+
+#     Converts Matlab variables into dictionaries for structures, lists for arrays of structures, and returns the input as is for other types of variables (e.g., numeric arrays, strings).
+    
+#     Inputs:
+#     ----------
+#     matvar (Matlab variable object or numpy array of Matlab variables): data stored as a Matlab object
+#     prefix_varname (string) [optional]: prefix to add to each key of D. Default: no prefix.
+        
+#     Outputs:
+#     ----------
+#     D or matvar (dictionary or list of dictionaries or other): data stored as a dictionary if matvar is a single structure, or a list of dictionaries if matvar is an array of structures
+#     """
+
+    # ---- Single MATLAB struct ----
+    if isinstance(matvar, mat_struct):
+        D = {}
+        for key in matvar._fieldnames:
+            if key.startswith('_'):
+                continue
+            value = getattr(matvar, key)
+            D[prefix_varname + key] = matvar2dict(value)
+        return D
+
+    # ---- Array of MATLAB structs ----
+    elif isinstance(matvar, np.ndarray) and matvar.size > 0 and isinstance(matvar.flat[0], mat_struct):
+        return [matvar2dict(v) for v in matvar.flat]
+
+    # ---- Everything else (numeric, string, datetime, etc.) ----
+    else:
+        return matvar
 
 def read_bathy(datafolder,datafiles,lake_elev):
     """Function read_bathy
