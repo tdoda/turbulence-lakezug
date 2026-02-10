@@ -1,4 +1,4 @@
-function [rhoTS,Cmatch,Sal,depth] = compute_rho_salinity(lakename,Temp,Cond,Press,JAC_correction)
+function [rhoTS,Cmatch,Cond20,Sal,depth] = compute_rho_salinity(lakename,Temp,Cond,Press,JAC_correction)
 %COMPUTE_RHO_SALINITY Computes salinity, density and depth based on
 %temperature, conductivity and pressure for a given lake.
 %
@@ -14,7 +14,8 @@ function [rhoTS,Cmatch,Sal,depth] = compute_rho_salinity(lakename,Temp,Cond,Pres
 %   OUTPUTS:
 %   rhoTS (1*n double array): density [kg m^-3] as a function of Temperature and Salinity
 %   Cmatch (1*n double array): corrected conductivity [uS/cm] to match
-%   temperature data
+%   temperature data response
+%   cond20 (1*n double array): conductivity at 20°C [uS/cm] 
 %   Sal (1*n double array): Salinity [g kg^-1]
 %   depth (1*n double array): depth [m] (not corrected for atmospheric
 %   pressure)
@@ -27,6 +28,7 @@ end
 
 Cond(Cond<0)=0; % Replace negative conductivity values by zero (T. Doda)
 Cond(~isfinite(Cond))=0; % Replace non finite conductivity values by zero (T. Doda)
+Cond20=NaN(size(Cond));
 
 if strcmp(lakename,'default')
     [Sal,Cmatch]=salinity_JAC(Press,Temp,Cond);

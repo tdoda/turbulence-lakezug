@@ -214,6 +214,7 @@ SLOW.velocity=Ws;
 SLOW.depth = depth;
 SLOW.temperature = T_JAC;
 SLOW.conductivity = C_corr; %uS/cm
+SLOW.conductivity20 = DATA.Cond_20(iips); %uS/cm
 SLOW.salinity = 1000*Ss; %mg/l
 SLOW.density = sgt;
 SLOW.chlorophyll = Chl_slow;
@@ -625,9 +626,9 @@ for i = 1:n_pres %length(pres)
                         %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i), BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                         %     TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1, BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1, BIN.kL_S1(i),BIN.kU_S1(i),BIN.SPECTRUMS1(i)] = ...
                             TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh1',make_plot_spectra,Pf(jp),T1f(jp));
-                        [BIN.eps_S2(i), BIN.MAD_S2(i), ~,flag_good_S2,  BIN.kL_S2(i),BIN.kU_S2(i)] = ...
+                        [BIN.eps_S2(i), BIN.MAD_S2(i), ~,flag_good_S2,  BIN.kL_S2(i),BIN.kU_S2(i),BIN.SPECTRUMS2(i)] = ...
                             TKE_dis_spec(Pf(jp),[sh1_hp(jp) sh2_hp(jp)],AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh2',make_plot_spectra,Pf(jp),T1f(jp));
                         BIN.kB_S1(i)=1/(2*pi())*(BIN.eps_S1(i)/(kin_visco*D^2))^(1/4);
                         BIN.kB_S2(i)=1/(2*pi())*(BIN.eps_S2(i)/(kin_visco*D^2))^(1/4);
@@ -656,7 +657,7 @@ for i = 1:n_pres %length(pres)
                     try
                         % [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),BIN.flag_S1(i),  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
                         %     TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp),0.1,14,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp),folder_out,filename,profID);
-                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1,  BIN.kL_S1(i),BIN.kU_S1(i)] = ...
+                        [BIN.eps_S1(i), BIN.MAD_S1(i), BIN.MADc(i),flag_good_S1,  BIN.kL_S1(i),BIN.kU_S1(i),BIN.SPECTRUMS1(i)] = ...
                             TKE_dis_spec(Pf(jp),sh1_hp(jp),AA(jp,:),info.minKS,info.maxKS,info.fAA,kin_visco,WW, Nfft, overlap, info.noise_corr,'sh_1',make_plot_spectra,Pf(jp),T1f(jp));
                         
                         % Flag indices defined as =1 for bad data (opposite of TKE_dis_spec):
