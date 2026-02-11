@@ -346,6 +346,8 @@ tags
 *.png
 *.svg
 *.eps
+*.SRD
+*.TOB
 #data/**/*.fig
 #data/**/*.png
 #data/**/*.mat
