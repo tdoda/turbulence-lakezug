@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 #%% Specify field campaign here:
 plt.close('all')
-date_campaign='20250402'
+date_campaign='20260113' # date of the campaign (format YYYYMMDD)
 data_folder=os.path.join('../../data/CTD',date_campaign,'Level2')
 filenames=os.listdir(data_folder)
 
@@ -109,7 +109,7 @@ ax[1].set_xlabel(r"$\rho$ [kg/m$^3$]")
 
 #%% Plot Thorpe for a given profile
 #Raw data
-k_time=11
+k_time=0
 k_file=ind_sort_chrono[k_time]
 
 fig,ax=plt.subplots(1,2,sharey=True)
