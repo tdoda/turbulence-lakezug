@@ -58,7 +58,8 @@ if modify_cfg
     end
     if isfield(param,'cfgfile')&&~isempty(param.cfgfile) % Get the configuration from the specified configuration file
         if strcmp(param.atm_press_method,'offset')
-            answ=input("WARNING: the pressure offset will only be applied if it has been included in the config file. Continue (Y/N)?",'s');
+            %answ=input("WARNING: the pressure offset will only be applied if it has been included in the config file. Continue (Y/N)?",'s');
+            answ='y';
             if ~strcmp(answ,"Y") && ~strcmp(answ,"y")
                 error("Stop the analysis: please update the config file or change the pressure correction method")
             end
