@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../1-Turbulence_TALEX/turbulence_methods"
 		}
 	],
 	"settings": {}
