@@ -227,13 +227,12 @@ if k(2)<k2
 
     %% Export spectra information (T. Doda, 10.02.2026)
     SPECTRUM.k      = k;        % Wavenumbers used for the shear spectrum
-    SPECTRUM.k_fit  = k(1:ik3); % Wavenumbers used for fitting
     SPECTRUM.PSD0   = PSD0;     % Raw / corrected-for-response shear spectrum
     SPECTRUM.PSD    = PSD;      % Denoised shear spectrum
-    SPECTRUM.PSD_fit= PSD(1:ik3); % PSD used in fit
+    SPECTRUM.ind_fit=1:ik3; % Indices of wavenumbers used for fitting
     SPECTRUM.PSD_theo    = NAS;      % Nasmyth spectrum (iteration result)
     SPECTRUM.kK     = kK;       % Kolmogorov wavenumber
-    SPECTRUM.k_AA   = fn/W;     % Anti-aliasing cutoff
+    SPECTRUM.kn   = fn/W;     % 90% of the anti-aliasing cutoff wavenumber
     SPECTRUM.k_lim  = 150;      % Hard upper k-limit used in plot
     
     %% Plots

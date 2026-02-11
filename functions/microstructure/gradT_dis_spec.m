@@ -379,6 +379,17 @@ if cont
     SPECTRUM.Sn=Sn; % Noise spectrum corrected for time response over k
     SPECTRUM.H=H; % Time response correction parameters over k
     SPECTRUM.H_lim=H_lim; % Maximal value of H
+    SPECTRUM.kB=kB; % Batchelor wavenumber
+    SPECTRUM.kn=fn/W; % 90% of the anti-aliasing cutoff wavenumber
+    SPECTRUM.kP=kP; % Peak wavenumber
+
+    itmp=find(PSD0<Snfact*Sn0 ,1,'first');
+    if isempty(itmp)
+        itmp=length(k0);
+    end
+
+    SPECTRUM.kSNR=k0(itmp); % wavenumber above which noise dominates 
+    SPECTRUM.kH=k0(find(H<H_lim ,1,'first')); % wavenumber above which the time response correction factor is below threshold value 
 
     %% Plots
     if plt~=0         
@@ -419,10 +430,6 @@ if cont
         
         plot(kB,1.4E-9,'^','markeredgecolor','k','markerfacecolor','k','markersize',5)
         plot(fn/W,1.4E-9,'^','markeredgecolor',[0.5 0.5 0.5],'markerfacecolor',[0.5 0.5 0.5],'markersize',5)
-        itmp=find(PSD0<Snfact*Sn0 ,1,'first');
-        if isempty(itmp)
-            itmp=length(k0);
-        end
         plot(k0(itmp),1.4E-9,'^','markerfacecolor',[0.75 0.75 0.75],'markeredgecolor',[0.75 0.75 0.75],'markersize',5)
         plot(k0(find(H<H_lim ,1,'first')),1.4E-9,'^','markeredgecolor','k','markerfacecolor',[1 1 1],'markersize',5)
         plot(kP,1.4E-9,'^','markeredgecolor',[75 97 209]/255,'markerfacecolor',[75 97 209]/255,'markersize',5)
