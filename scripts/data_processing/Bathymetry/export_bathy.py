@@ -103,8 +103,8 @@ ds["y_contour"].attrs = {
     "units": "m"
 }
 
-# Save in the same folder as the script:
-# ds.to_netcdf('bathymetry_Zug_'+str(dx_m)+'m.nc', mode="w")
+# Save in batheymetry data folder:
+# ds.to_netcdf(os.path.join('..','..','data','Bathymetry','Level2', 'bathymetry_Zug_'+str(dx_m)+'m.nc'), mode="w")
 
 # Save in the same folder as the original data (if permission error):
 ds.to_netcdf(os.path.join(datafolder, 'bathymetry_Zug_'+str(dx_m)+'m.nc'), mode="w")

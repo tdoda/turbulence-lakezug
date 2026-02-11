@@ -23,10 +23,10 @@ plt.close('all')
 os.chdir(Path(__file__).resolve().parent)
 
 #%% Load interpolated bathymetry data from netCDF
-depth_interp = read_netCDF_xr(os.path.join('..','..','analysis','5-Export_bathymetry','bathymetry_Zug_10m.nc'))
+depth_interp = read_netCDF_xr(os.path.join('..','..','data','Bathymetry','Level2','bathymetry_Zug_10m.nc'))
 
 #%% Load HR data:
-depth_xr = read_netCDF_xr(os.path.join('..','..','analysis','5-Export_bathymetry','bathymetry_Zug_1m.nc'))
+depth_xr = read_netCDF_xr(os.path.join('..','..','data','Bathymetry','Level2','bathymetry_Zug_1m.nc'))
 
 #%% Figure 
 
