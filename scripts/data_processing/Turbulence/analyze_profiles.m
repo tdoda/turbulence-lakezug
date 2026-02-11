@@ -12,10 +12,10 @@ clc
 %% Parameters to adapt
 
 lakename='Zug'; % Options: 'Zug' or 'default' (see load_parameters_Zug function)
-general_data_folder='..\..\data\VMP\'; % Where fieldwork data is stored
+general_data_folder='..\..\..\data\microCTD\'; % Where fieldwork data is stored
 odas_folder='..\..\functions\odas_v4.4\'; % Where ODAS functions are stored
 functions_folder="..\..\functions\microstructure\"; % Where microstructure functions are stored
-date_campaign="20251126"; % Should match the date in "load_parameters" function except if "default" is used
+date_campaign="20260113"; % Should match the date in "load_parameters" function except if "default" is used
 
 turbulence_analysis=true; % If =true, run the full turbulence analysis, if =false just check the profiles
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
@@ -43,7 +43,7 @@ addpath(functions_folder) % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug(lakename,date_campaign,general_data_folder);
 %param=load_parameters_Geneva(lakename,date_campaign,general_data_folder);
-param.filename_list={'VMP003'};
+param.filename_list={'DAT_053'};
 
 if modify_cfg 
     if (~isfield(param,'cfgfile') || strcmp(param.cfgfile,''))
@@ -64,6 +64,14 @@ end
 if ~isfield(param,'atm_press_method')
     warning("No atm pressure method specified: use offset")
     param.atm_press_method='offset';
+end
+
+% Read logbook
+if isfield(param,'logbook')
+    data_logbook = readtable([param.folder,param.logbook,'.csv'], 'PreserveVariableNames', true);
+    add_coord=true;
+else
+    add_coord=false;
 end
 
 %% Analyze each data file
@@ -233,6 +241,15 @@ for kf=1:length(param.filename_list)
     if turbulence_analysis
         counter=1;
         indremove=[];
+
+        % Extract coordinates of the profiles
+        indprof_log=find(strcmp(data_logbook.filename,param.filename_list{kf}));
+        if length(indprof_log)~=Nprf
+            warning('Not same number of profiles than in logbook: coordinates not extracted')
+            add_coord=false;
+        end
+
+
         for kprof = 1:Nprf
             fprintf('>>> Analysis of profile %d/%d\n',kprof, Nprf)
             
@@ -356,7 +373,13 @@ for kf=1:length(param.filename_list)
             if ~isempty(DISS_QL)
                 DATA_NC.DISS_QL=DISS_QL{counter};
             end
-            export_to_netcdf([folder_L2,'..\L2_',param.filename_list{kf},'_',param.info.prof_dir,'_prof',num2str(counter),'.nc'],DATA_NC,param,'L2')
+
+            param_prof=param;
+            if add_coord
+                param_prof.x_coord=data_logbook.X_m(indprof_log(kprof));
+                param_prof.y_coord=data_logbook.Y_m(indprof_log(kprof));
+            end
+            export_to_netcdf([folder_L2,'..\L2_',param.filename_list{kf},'_',param.info.prof_dir,'_prof',num2str(counter),'.nc'],DATA_NC,param_prof,'L2')
             
             counter=counter+1;
         end

@@ -343,6 +343,7 @@ elseif strcmp(date,'20251127')
 elseif strcmp(date,'20260113') 
     param.folder = [general_data_folder,'20260113\Level0\'];
     param.filename_list={'DAT_053','DAT_055','DAT_057','DAT_059'}; % Several files can be listed here
+    param.logbook='Logbook_Zug_20260112'; % csv file
 
     % Set P offset and sh probe sensitivity
     %param.offset_P=0;
