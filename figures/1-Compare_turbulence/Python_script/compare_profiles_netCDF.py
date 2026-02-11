@@ -9,16 +9,17 @@ sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\..\functions\ctd
 from functions_ctd import thorpe_scale
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\..\functions\general_functions'))
 from general_functions import matstruct2dict, read_netCDF_xr, read_netCDF
-import netCDF4
 import numpy as np
-import xarray as xr
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams['font.size'] = 12
 plt.rcParams['font.family'] = 'Arial'  # or any installed font
-from scipy.io import loadmat
 plt.close('all')
+
+# Set working directory to the script's location
+os.chdir(Path(__file__).resolve().parent)
 
 #%% Specify field campaign here:
 campaign_name='20260113'
@@ -42,8 +43,11 @@ indC1=np.where(np.array(profnames)=='VMPC1')[0]
 indW=np.where(np.array(profnames)=='VMPW')[0]
 indC2=np.where(np.array(profnames)=='VMPC2')[0]
 
-savefig=True
+savefig=False
 
+colplot=plt.get_cmap('tab10',len(fileprof))
+white_color_fraction=0.6
+whitecol=np.array([1,1,1,1])
 
 #%% Load the data from netCDF files
 
@@ -69,13 +73,13 @@ fig,ax = plt.subplots(1,4,figsize=(18 / 2.54, 9 / 2.54),sharey=True)  # Convert 
 
 
 for kf in range(len(dataprof)):
-    #ax[0].plot(dataprof["temperature"],dataprof_slow["depth"],linewidth=1)
+    #ax[0].plot(dataprof["temperature"],dataprof_slow["depth"],linewidth=1,color=colplot(kf))
     
-    ax[1].plot(dataprof[kf].FAST_fast_T1.data,dataprof[kf].FAST_depth,linewidth=1)
+    ax[1].plot(dataprof[kf].FAST_fast_T1.data,dataprof[kf].FAST_depth,linewidth=1,color=colplot(kf))
     
-    ax[2].plot(dataprof[kf].FAST_grad_T1.data+2*kf,dataprof[kf].FAST_depth,linewidth=1)
+    ax[2].plot(dataprof[kf].FAST_grad_T1.data+2*kf,dataprof[kf].FAST_depth,linewidth=1,color=colplot(kf))
     
-    ax[3].plot(dataprof[kf].FAST_fast_S1.data+kf,dataprof[kf].FAST_depth,linewidth=1)
+    ax[3].plot(dataprof[kf].FAST_fast_S1.data+kf,dataprof[kf].FAST_depth,linewidth=1,color=colplot(kf))
 
 
 # Labels and limits:
@@ -102,17 +106,21 @@ fig,ax = plt.subplots(1,4,figsize=(18 / 2.54, 9 / 2.54),sharey=True)  # Convert 
 
 
 for kf in range(len(dataprof)):
+    pale_color = white_color_fraction * whitecol + (1-white_color_fraction) * np.array(colplot(kf))
+    
     indkeep_T1=np.where(dataprof[kf].BINNED_flag_T1.data==0)[0]
     indkeep_S1=np.where(dataprof[kf].BINNED_flag_S1.data==0)[0]
     
-    ax[0].plot(dataprof[kf].BINNED_LTuT1.data,dataprof[kf].BINNED_depth.data,'-',linewidth=1)
+    ax[0].plot(dataprof[kf].BINNED_LTuT1.data,dataprof[kf].BINNED_depth.data,'-',linewidth=1,color=colplot(kf))
     
-    ax[1].plot(dataprof[kf].BINNED_Xi_T1.data,dataprof[kf].BINNED_depth.data,'k.',linewidth=1)
-    ax[1].plot(dataprof[kf].BINNED_Xi_T1.data[indkeep_T1],dataprof[kf].BINNED_depth.data[indkeep_T1],'-',linewidth=1)
+    ax[1].plot(dataprof[kf].BINNED_Xi_T1.data,dataprof[kf].BINNED_depth.data,'.',linewidth=1,color=pale_color)
+    ax[1].plot(dataprof[kf].BINNED_Xi_T1.data[indkeep_T1],dataprof[kf].BINNED_depth.data[indkeep_T1],'.-',linewidth=1,color=colplot(kf))
     
-    ax[2].plot(dataprof[kf].BINNED_eps_T1.data[indkeep_T1],dataprof[kf].BINNED_depth.data[indkeep_T1],'-',linewidth=1)
+    ax[2].plot(dataprof[kf].BINNED_eps_T1.data,dataprof[kf].BINNED_depth.data,'.',linewidth=1,color=pale_color)
+    ax[2].plot(dataprof[kf].BINNED_eps_T1.data[indkeep_T1],dataprof[kf].BINNED_depth.data[indkeep_T1],'.-',linewidth=1,color=colplot(kf))
     
-    ax[3].plot(dataprof[kf].BINNED_eps_S1.data[indkeep_S1],dataprof[kf].BINNED_depth.data[indkeep_S1],'-',linewidth=1)
+    ax[3].plot(dataprof[kf].BINNED_eps_S1.data,dataprof[kf].BINNED_depth.data,'.',linewidth=1,color=pale_color)
+    ax[3].plot(dataprof[kf].BINNED_eps_S1.data[indkeep_S1],dataprof[kf].BINNED_depth.data[indkeep_S1],'.-',linewidth=1,color=colplot(kf))
     
     
 # Labels and limits:
@@ -151,6 +159,7 @@ fig.set_tight_layout(True)
 if savefig:
     fig.savefig('comparison_turbulence_'+campaign_name+'.png',dpi=400)
     fig.savefig('comparison_turbulence_'+campaign_name+'.svg',dpi=400)
+
 
 #%% Figure averaged turbulence
 colC1=[1, 0.4, 0.15]
@@ -266,3 +275,6 @@ fig.set_tight_layout(True)
 if savefig:
     fig.savefig('comparison_turbulence_avg_'+campaign_name+'.png',dpi=400)
     fig.savefig('comparison_turbulence_avg_'+campaign_name+'.svg',dpi=1000)
+
+#%% To display the figures in interactive mode in VS Code
+plt.show()
