@@ -23,68 +23,126 @@ Link to the remote repository: https://github.com/tdoda/turbulence-lakezug.git
 
 <font color='red'>*Add information about the field campaigns.*</font>
 
-## Use the repository 
+## Installation
 
-### Install the repository locally
+### 1. Matlab installation
 
-To work with the project on your local machine, you need to have [git](https://git-scm.com/downloads) and [git-lfs](https://git-lfs.github.com/) installed in order to successfully clone the repository.
+Matlab is required to run some of the scripts.
 
-- Clone the repository to your local machine using the command:
+### 2. Python installation
 
- `git clone https://github.com/tdoda/turbulence-lakezug.git`
+Python 3 is required to run some of the scripts. Three types of installation are possible:
+- Recommended option: download [Miniforge](https://github.com/conda-forge/miniforge). 
+- User-friendly option: download the [Anaconda distribution](https://www.anaconda.com/products/individual).
+- Classic option: download Python from the [official website](https://www.python.org/downloads/).
+
+### 3. Repository installation
+
+- If using GIT, clone the repository to your local machine using the command in Git Bash: 
+
+    ``` 
+    git clone https://github.com/tdoda/turbulence-lakezug.git
+    ```
  
- Note that the repository will be copied to your current working directory.
+    Note that the repository will be copied to your current working directory.
+- Without GIT, just download the entire ZIP folder from https://github.com/tdoda/turbulence-lakezug.git ("Code" > "Download ZIP") and extract it.
 
-- Use Python 3 and install the requirements with:
+### 4. Python packages installation
 
- `pip install -r requirements.txt`
+<font color='red'>*Need to update environment and requirements files.*
+</font>
 
- The python version can be checked by running the command `python --version`. In case python is not installed or only an older version of it, it is recommend to install python through the anaconda distribution which can be downloaded [here](https://www.anaconda.com/products/individual). 
+1. Open the terminal (e.g., Anaconda Prompt), and move to the `turbulence_methods` repository.
+2. Create a new environment *turbulence-methods* and install the packages as follows:
+    - If using conda (Anaconda or Miniforge installation):
+        ```
+        conda env create -f environment.yml
+        conda activate turbulence-methods 
+        ```
+        It is also possible to install the packages from `requirements.txt` with pip instead:
+        ```
+        conda create -n turbulence-methods python=3.11
+        conda activate turbulence-methods
+        pip install -r requirements.txt
+        ```
+    - If using mamba (Anaconda or Miniforge installation):
+        ```
+        mamba env create -f environment.yml
+        mamba activate turbulence-methods 
+        ```
+    - If using pip (classic Python installation):
+        ```
+        python -m venv turbulence-methods       
+        source turbulence-methods /bin/activate  # For Linux/macOS
+        turbulence-methods\Scripts\activate     # For Windows
+        pip install -r requirements.txt
+        ```
 
-### Process new VMP data
+## Working with the project online without any installation (Renku)
 
-Here are the steps to process new data:
-1. Create a new folder in `data\VMP` with the date of the campaign
-2. Add the raw data files (`*.P`) in a `Level0` subfolder, with the `*.cfg` file and a `readme.txt` file
-3. If default parameters are used for the turbulence analysis (quick method), go to the next step directly.\
-Otherwise, modify the file `\functions\microstructure\load_parameters_Zug.m` by adding the campaign-specific parameters in the function `load_campaign_Zug()`.
-4. In `analysis\1-Export_turbulence\analyze_profiles.m`, update the parameters of the campaign (`date_campaign`,`cfg_file` if not already specified in step 3, etc.)
-5. Run `analysis\1-Export_turbulence\analyze_profiles.m`.
+To run **Python** scripts on the browser (without any installation), you can use the Renku
+platform. Note that this approach **does not** work for Matlab scripts, that can only be ran [locally](#installation-on-a-local-repository) with Matlab installed.
 
+Two options with Renku:
+- Directly run the created session by clicking here: [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/p/tomy.doda/turbulence-lakezug/sessions/01KH6HD8JH0JS73PQVR08HA93E/start)
+- Access the Renku project [here](https://renkulab.io/p/tomy.doda/turbulence-lakezug) and start a new session in the `Sessions` tab. This will start an interactive environment right in your browser.
 
-## Working with the project on the Renku platform (online)
+## Usage 
 
-The Renku project can be found here: https://renkulab.io/p/tomy.doda/turbulence-lakezug 
+### Data processing
 
-To run the scripts via Renku, click on the `Sessions` tab and start a new session.
-This will start an interactive environment right in your browser.
+The raw (Level0) and processed (>Level1) data are stored in the `data` folder. The raw data is processed using the scripts in `scripts/data_processing` as explained below.
+
+#### Turbulence data (microstructure)
+
+The scripts and procedure are explained on the [turbulence-methods](https://github.com/tdoda/turbulence_methods.git) repository.
+
+#### CTD
+
+<font color='red'>*Add procedure.*</font>
+
+#### Bathymetry
+
+<font color='red'>*Add procedure.*</font>
+
+### Data visualization
+The processed data can be quickly visualized using the notebooks in `notebooks/visualization`.
+
+### Data analysis
+The processed data is further analyzed using the scripts in `scripts/data_analysis` and saved in the same folder.
+
+### Data exploration
+Data is explored (e.g., for a specific field campaign) using reports as notebooks in `notebooks/reports`.
+
+### Figures
+Specific figures from analyzed data are generated in `figures`.
+
 
 ## Structure of the repository
 
 ### Folder `data`
-VMP and CTD data organized in levels. 
+Data organized in processing levels. 
 
 <font color='red'>*Add details about the data here.*</font>
 
-<br />
 
-### Folder `analysis`
-Scripts performing data analysis.
-#### Folder `1-Analyze_turbulence`
+
+### Folder `scripts`
+Scripts processing the data performing further analyses.
+#### `data_processing`
+- `Turbulence`
 <font color='red'>*Add details about the turbulence analysis here.*</font>
 
-#### Folder `1-Analyze_ctd`
+- `CTD`
+    - Script `read_ctd.py`: read and export the CTD data to netCDF files.
 
-- Script `read_ctd.py`: read and export the CTD data to netCDF files.
+#### `data_analysis`
 
-<br />
 
-### Folder `functions`
+#### `functions`
 Functions used by the analysis scripts.
 
 <font color='red'>*Add more information here.*</font>
-
-<br />
 
 ### Folder `figures`
 Figures showing the results of the analyses.
@@ -94,14 +152,17 @@ Figures showing the results of the analyses.
 <br />
 
 ### Folder `notebooks`
+#### `visualization`
 Jupyter notebooks to visualize the data:
-- CTD data: `plot_ctd.ipynb`
-- VMP data: <font color='red'>*not available yet*</font>
+- `plot_ctd.ipynb`: CTD data
+- `plot_turbulence.ipynb`: turbulence data (including spectra)
+
+#### `reports`
+Jupyter notebooks exploring the datasets.
 
 ## Future updates
 
-- Export of the data as netcdf files (including level 1)
-- Jupyter notebooks to visualize the data
+- ...
 
 ## Collaborators
 
@@ -110,5 +171,4 @@ Jupyter notebooks to visualize the data:
 
 ## Contact
 - [Tomy Doda](mailto:tomy.doda@unil.ch)
-- [Haydn Herrema](mailto:haydn.herrema@eawag.ch)
-- [Damien Bouffard](mailto:damien.bouffard@eawag.ch)
+
