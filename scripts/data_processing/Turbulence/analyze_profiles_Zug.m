@@ -12,10 +12,13 @@ clc
 %% Parameters to adapt
 
 lakename='Zug'; % Options: 'Zug' or 'default' (see load_parameters_Zug function)
-general_data_folder='..\..\..\data\microCTD\'; % Where fieldwork data is stored
-odas_folder='..\..\functions\odas_v4.4\'; % Where ODAS functions are stored
-functions_folder="..\..\functions\microstructure\"; % Where microstructure functions are stored
-date_campaign="20260113"; % Should match the date in "load_parameters" function except if "default" is used
+general_data_folder='..\..\..\data\VMP\'; % Where fieldwork data is stored
+% odas_folder='..\..\functions\odas_v4.4\'; % Where ODAS functions are stored
+% functions_folder="..\..\functions\microstructure\"; % Where microstructure functions are stored
+% Use turbulence-methods repo:
+odas_folder='C:\Users\tdoda\OneDrive - Université de Lausanne\Projects-GSE42572\1-Turbulence_TALEX\turbulence_methods\scripts\odas_v4.4\'; % Where ODAS functions are stored
+functions_folder="C:\Users\tdoda\OneDrive - Université de Lausanne\Projects-GSE42572\1-Turbulence_TALEX\turbulence_methods\scripts\microstructure\"; % Where microstructure functions are stored
+date_campaign="20251126"; % Should match the date in "load_parameters" function except if "default" is used
 
 turbulence_analysis=true; % If =true, run the full turbulence analysis, if =false just check the profiles
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
@@ -41,9 +44,9 @@ addpath(odas_folder)
 addpath(functions_folder) % Add microstructure functions
 
 %% Load metadata
-param=load_parameters_Zug(lakename,date_campaign,general_data_folder);
+param=load_parameters_Zug_Tomy(lakename,date_campaign,general_data_folder);
 %param=load_parameters_Geneva(lakename,date_campaign,general_data_folder);
-param.filename_list={'DAT_053'};
+%param.filename_list={'DAT_059'};
 
 if modify_cfg 
     if (~isfield(param,'cfgfile') || strcmp(param.cfgfile,''))
@@ -243,7 +246,9 @@ for kf=1:length(param.filename_list)
         indremove=[];
 
         % Extract coordinates of the profiles
-        indprof_log=find(strcmp(data_logbook.filename,param.filename_list{kf}));
+        if add_coord==true
+            indprof_log=find(strcmp(data_logbook.filename,param.filename_list{kf}));
+        end
         if length(indprof_log)~=Nprf
             warning('Not same number of profiles than in logbook: coordinates not extracted')
             add_coord=false;
@@ -376,11 +381,19 @@ for kf=1:length(param.filename_list)
 
             param_prof=param;
             if add_coord
-                param_prof.x_coord=data_logbook.X_m(indprof_log(kprof));
-                param_prof.y_coord=data_logbook.Y_m(indprof_log(kprof));
+                if ismember("X_m", data_logbook.Properties.VariableNames)
+                    param_prof.x_coord=data_logbook.X_m(indprof_log(kprof));
+                end
+                if ismember("Y_m", data_logbook.Properties.VariableNames)
+                    param_prof.y_coord=data_logbook.Y_m(indprof_log(kprof));
+                end
+                if ismember("Name_profile", data_logbook.Properties.VariableNames)
+                    profname_cell=data_logbook.Name_profile(indprof_log(kprof));
+                    param_prof.profname=profname_cell{:};
+                end
             end
             export_to_netcdf([folder_L2,'..\L2_',param.filename_list{kf},'_',param.info.prof_dir,'_prof',num2str(counter),'.nc'],DATA_NC,param_prof,'L2')
-            
+            %export_to_netcdf(['L2_',param.filename_list{kf},'_',param.info.prof_dir,'_prof',num2str(counter),'.nc'],DATA_NC,param_prof,'L2')
             counter=counter+1;
         end
     

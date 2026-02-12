@@ -1,5 +1,5 @@
 
-function [param] = load_parameters_Zug(lakename,date,general_data_folder,direction,instrument)
+function [param] = load_parameters_Zug_Tomy(lakename,date,general_data_folder,direction,instrument)
 %LOAD_PARAMETERS Give parameters specific to a field campaign.
 %
 %   INPUTS:
