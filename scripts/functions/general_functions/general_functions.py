@@ -681,3 +681,17 @@ def read_bathy(datafolder,datafiles,lake_elev):
 
     return depth_xr
 
+def datenum2timestamp(datenum):
+    """Function datenum2timestamp
+
+    Converts MATLAB datenum to Python timestamp.
+    
+    Inputs:
+    ----------
+    datenum (float): MATLAB datenum value (number of days since 01.01.0000)  
+    
+    Outputs:
+    ----------
+    timestamp (float): Python timestamp value (number of seconds since 01.01.1970)
+    """
+    return (datenum - 719529) * 86400 # [s] 719529 is the number of days between 01.01.0000 and 01.01.1970, 86400 is the number of seconds in a day
