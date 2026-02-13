@@ -695,3 +695,37 @@ def datenum2timestamp(datenum):
     timestamp (float): Python timestamp value (number of seconds since 01.01.1970)
     """
     return (datenum - 719529) * 86400 # [s] 719529 is the number of days between 01.01.0000 and 01.01.1970, 86400 is the number of seconds in a day
+
+
+def concat_datasets_by_coords(ds1, ds2, concat_coords):
+    """
+    Concatenate two xarray Datasets along each variable's dimension if it is in concat_coords.
+    Variables that do not depend on any coordinate in concat_coords are kept as-is from ds1.
+    
+    Parameters
+    ----------
+    ds1, ds2 : xarray.Dataset
+        Datasets to concatenate. Must have the same variables and coordinates.
+    concat_coords : list of str
+        List of coordinate names along which to concatenate variables.
+        
+    Returns
+    -------
+    xr.Dataset
+        Concatenated dataset.
+    """
+    merged = {}
+    
+    for var in ds1.data_vars:
+        var_dims = ds1[var].dims
+        # find first dimension of the variable that is in concat_coords
+        concat_dim = next((d for d in var_dims if d in concat_coords), None)
+        
+        if concat_dim is not None:
+            # concatenate along that dimension
+            merged[var] = xr.concat([ds1[var], ds2[var]], dim=concat_dim)
+        else:
+            # keep variable as-is
+            merged[var] = ds1[var]
+            
+    return xr.Dataset(merged)
