@@ -50,13 +50,21 @@ def get_cmap_discrete(cmap_name,n):
 
 def compute_logmedian_dict(DATA,cell_size,varname,ind_file=np.nan,fieldname="BINNED"):
     """Function compute_logmedian_dict
+
+    Computes the median of the log of a variable in depth cells of size cell_size for several profiles contained in a dictionary. The profiles can be either in a list (fieldname) or directly in the dictionary (fieldname=None).
     
-    DATA: dictionary
+    Inputs: 
+        DATA (dictionary): dictionary containing the profiles data
+        cell_size (float): size of the depth cells in meters
+        varname (string): name of the variable to compute the log median for
+        ind_file (list) [optional]: list of indices of the profiles to use in the dictionary. Default: np.nan (all profiles are used)
+        fieldname (string) [optional]: name of the field in the dictionary containing the profiles. Default: None (the profiles are directly in the dictionary). The profiles can be either in a list (fieldname) or directly in the dictionary (fieldname=None). 
 
-    ind_file and fieldname are optional
-
-    Returns median of the log of the variable between cell depth (i-1) and cell
-    depth i
+    Outputs:
+        depth_allprof (array): all depths of the profiles combined
+        var_allprof (array): all values of the variable combined
+        depth_cells (array): depths of the cells
+        logmed_cells (array): median of the log of the variable between cell depth (i-1) and cell depth i
    
     
      """
