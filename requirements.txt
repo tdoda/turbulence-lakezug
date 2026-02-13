@@ -1,4 +1,15 @@
-# existing dependencices
-# ...
-# add the Pyodide kernel
-jupyterlite-pyodide-kernel
+cmocean==4.0.3
+dateparser==1.2.0
+envass==1.0.0
+matplotlib==3.10.8
+netCDF4==1.7.4
+numpy==1.23.5
+pandas==3.0.0
+python_dateutil==2.9.0.post0
+scipy==1.9.3
+seawater==3.3.5
+xarray==2022.11.0
+pyrsktools==1.1.1
+notebook
+gsw
+openpyxl

@@ -1,0 +1,33 @@
+{
+  "filename": "K1131806_5.TOB",
+  "valid": true,
+  "campaign": {
+    "Campaign Name": "20260113_IBEX_Zug",
+    "Project Name": "IBEX",
+    "Device": "Sea&Sun CTD (1807)",
+    "Serial No": "1807",
+    "Person in charge": "Haydn Herrema",
+    "Other people involved": "Tomy Doda",
+    "Date of measurement": "2026-01-13",
+    "Time Zone device (UTC+)": "0",
+    "Time Zone local (UTC+)": "1",
+    "Lake": "Lake Zug",
+    "Coordinate System": "CH1903 (Swiss Grid)",
+    "Altitude (m)": "417",
+    "General comment": "Winch slow"
+  },
+  "profile": {
+    "Profile name": "VMPW",
+    "Time of measurement (local)": "15:32",
+    "X Coordinate (CH1903)": "679917",
+    "Y Coordinate (CH1903)": "218647",
+    "Start pressure (dbar)": "",
+    "End pressure (dbar)": "",
+    "Something broke": false,
+    "Something got lost": false,
+    "Something is strange": false,
+    "Battery is empty": false,
+    "Battery was replaced": false,
+    "Other comment": "115 m, drift N to (679879, 218695, 94 m)"
+  }
+}
