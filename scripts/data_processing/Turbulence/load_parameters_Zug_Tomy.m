@@ -305,7 +305,9 @@ elseif strcmp(date,'20250626')
 %**************************************************************************
 elseif strcmp(date,'20251126') 
     param.folder = [general_data_folder,'20251126\Level0\'];
-    param.filename_list={'VMP003','VMP004','VMP005','VMP009','VMP010'}; % Several files can be listed here
+    param.filename_list={'VMP003','VMP004','VMP005','VMP009'}; % Several files can be listed here
+    % VMP010 is not processed because pipe from CTD broke (cannot calibrated FP07) and VMP power
+    % turned off at the end of profile
     param.logbook='Logbook_Zug_20251126'; % csv file
 
     % Set P offset: -0.15dbar, included in updated cfg file 
