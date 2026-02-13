@@ -251,7 +251,7 @@ for kf=1:length(param.filename_list)
             if length(indprof_log)==Nprf
                 add_coord_prof=true; % Extract metadata for this file
             else
-                warning('Not same number of profiles than in logbook: %d profiles detected in file %s, but %d profiles listed in logbook',Nprf,param.filename_list{kf},length(indprof_log))
+                warning('>>> Not same number of profiles than in logbook: %d profiles detected in file %s, but %d profiles listed in logbook',Nprf,param.filename_list{kf},length(indprof_log))
                 extract_meta=2;
                 while extract_meta ~= 0 &&  extract_meta ~= 1
                     extract_meta=input('>>> Skip metadata (0) or enter it manually (1)?');
@@ -260,11 +260,10 @@ for kf=1:length(param.filename_list)
                 if extract_meta==0
                     add_coord_prof=false;
                 else
-                    add_coord_prof=true;
                     newfilename=[param.filename_list{kf},'_added'];
                     for kprof = 1:Nprf % Ask the user for metadata and add them to the table
                         newRow = data_logbook(min(indprof_log),:); 
-                        fprintf(">>> Profile %d/%d in %s (%s):\n",kprof,Nprf,param.filename_list{kf},data_prof.tdate_slow(data_prof.ind_prof_slow_initial(1,kprof)))
+                        fprintf(">>> File %s, detected profile %d/%d (%s):\n",param.filename_list{kf},kprof,Nprf,data_prof.tdate_slow(data_prof.ind_prof_slow_initial(1,1)))
                         profname=[];xcoord=[]; ycoord=[];
                         while isempty(profname) 
                             profname=input(">>>>>> Profile name:",'s');
@@ -427,9 +426,6 @@ for kf=1:length(param.filename_list)
             end
 
             param_prof=param;
-            % Add filename:
-            param_prof.filename=param.filename_list{kf};
-            % Add coodinates & profile name:
             if add_coord_prof
                 if ismember("X_m", data_logbook.Properties.VariableNames)
                     param_prof.x_coord=data_logbook.X_m(indprof_log(kprof));
