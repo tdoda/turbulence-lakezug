@@ -12,11 +12,11 @@ logger = logging.getLogger(__name__)
 
 #%% Specify field campaign here:
 
-date_campaign='20260113'
+date_campaign='20251126'
 
 #%% Other parameters
 
-ctd_data_folder='..\..\data\ctd'
+ctd_data_folder='..\..\..\data\ctd'
 input_folder=os.path.join(ctd_data_folder,date_campaign)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", handlers=[
     logging.FileHandler("debug.log"),
