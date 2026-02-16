@@ -103,14 +103,20 @@ def compute_logmedian_dict(DATA,cell_size,varname,ind_file=np.nan,fieldname="BIN
 
 def compute_logmedian_list(depth_list,var_list,cell_size):
     """Function compute_logmedian_list
-    
-    var_list: list containing already the variable data
-    cell_size in meters
 
-    Returns median of the log of the variable between cell depth (i-1) and cell
-    depth i
-   
+    Computes the median of the log of a variable in depth cells of size cell_size for several profiles contained in a list. 
     
+    Inputs: 
+        depth_list (list): list containing the depth data
+        var_list (list): list containing the variable data
+        cell_size (float): size of the depth cells in meters
+
+    Outputs:
+        depth_allprof (array): all depths of the profiles combined
+        var_allprof (array): all values of the variable combined
+        depth_cells (array): depths of the cells
+        logmed_cells (array): median of the log of the variable between cell depth (i-1) and cell depth i
+
      """
  
     # Combine the data
