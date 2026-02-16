@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 #%% Specify field campaign here:
 
-date_campaign='20251126'
+date_campaign='20251128'
 
 #%% Other parameters
 

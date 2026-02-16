@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 #%% Specify field campaign here:
 plt.close('all')
 date_campaign='20260113' # date of the campaign (format YYYYMMDD)
-data_folder=os.path.join('../../data/CTD',date_campaign,'Level2')
+ctd_data_folder=os.path.join('../../../data/CTD',date_campaign)
+data_folder=os.path.join(ctd_data_folder,'Level2')
 filenames=os.listdir(data_folder)
 
 cut_top=0.8 # distance to remove from upper part of the profiles [m]
@@ -181,5 +182,5 @@ CTD_variables={"time": {"var_name": "time", "dim": ("time"),'unit': "seconds sin
                "disttrans":{"var_name": "disttrans", "dim": ("time"),'unit': "m", 'longname': "Distance along the transect"},
                "profnames":{"var_name": "profnames", "dim": ("time"),'unit': "-", 'longname': "Profile name","var_type": "str"}}
 
-export_netCDF("CTD_transect_{}.nc".format(date_campaign),CTD_attributes,CTD_dimensions,CTD_variables,CTDdata)
+export_netCDF(os.path.join(ctd_data_folder,"Level3","CTD_transect2_{}.nc".format(date_campaign)),CTD_attributes,CTD_dimensions,CTD_variables,CTDdata)
 
