@@ -1,0 +1,3 @@
+flagged for S1 fit
+flagged for T2 fit
+flagged for ST2

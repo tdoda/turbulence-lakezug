@@ -1,0 +1,7 @@
+filename,profID,Downward/Upward,Date,hh_UTC_start,mm_UTC_start,hh_Local_start,mm_Local_start,hh_UTC_end,mm_UTC_end,hh_Local_end,mm_Local_end,X_m,Y_m,Name_profile,Profile_depth_m,Instrument,Serial_Number,T1,T2,S1,S2,C1,C2,P_offset_dbar,Comments,
+Example,1,D,17-May-2024,20,49,22,49,20,56,22,56,540300,150178,P01,140,VMP,28,1699,1704,2020,2080,191,190,,"Time set to UTC, calibration file not modified, small weight",
+VMP002,1,D,27-Nov-2025,9,46,10,46,,,,,680339,217000,VMPS,,VMP,28,1704,1699,2079,,,,-0.06,"Time set to UTC, calibration file not modified. Vibrations over top 50 m and at 135 m.",
+VMP003,1,D,27-Nov-2025,10,15,11,15,,,,,680482,216713,VMPS,,VMP,28,1704,1699,2079,,,,-0.06,,
+VMP004,1,D,27-Nov-2025,11,45,12,45,,,,,680086,218780,VMPC,,VMP,28,1704,1699,2079,,,,-0.06,Vibrations below 160m? Got a knot,
+VMP005,1,D,27-Nov-2025,12,11,13,11,,,,,680119,218776,VMPC,,VMP,28,1704,1699,2079,,,,-0.06,Maybe touched the bottom?,
+VMP006,1,D,27-Nov-2025,12,38,13,38,,,,,680119,218778,VMPC,,VMP,28,1704,1699,2079,,,,-0.06,Good profile. Battery died on the way up.,
