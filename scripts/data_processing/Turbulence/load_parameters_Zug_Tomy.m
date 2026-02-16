@@ -295,6 +295,7 @@ elseif strcmp(date,'20250626')
     param.cfgfile = 'setup_EAWAG_Zug_2025_06_26';
     param.instrument='VMP';
     param.info.prof_dir = 'down';
+    param.atm_press_method='offset'; % Options: 'cond' (only for upward),'FP07' (only for upward),'offset','min'
 
     param.config.T1=true;
     param.config.T2=true;
@@ -313,9 +314,7 @@ elseif strcmp(date,'20251126')
     % Set P offset: -0.15dbar, included in updated cfg file 
     % Use shear sensitivities specified in config file: 
     param.cfgfile = 'setup_EAWAG_Zug_2025_11_26_updated';
-
     param.atm_press_method='offset'; % Options: 'cond' (only for upward),'FP07' (only for upward),'offset','min'
-    
     param.instrument='VMP';
     param.info.prof_dir = 'down';
     param.config.T1=true;
@@ -324,16 +323,21 @@ elseif strcmp(date,'20251126')
     param.config.S2=false;
     param.config.uC1=false;
     param.config.uC2=false;
+
+    % Increase size:
+    param.info.dpD = 5; % Bin size [m]
+    param.info.dp = 2.5; % 50% bin overlap [m]
 %**************************************************************************
 elseif strcmp(date,'20251127') 
     param.folder = [general_data_folder,'20251127\Level0\'];
     param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006'}; % Several files can be listed here
+    param.logbook='Logbook_Zug_20251127'; % csv file
 
-    % Set P offset and sh probe sensitivity
-    param.offset_P=-0.15;
+    % Set P offset: -0.06dbar, included in updated cfg file 
     % Use shear sensitivities specified in config file: 
-    param.cfgfile = 'setup_EAWAG_Zug_2025_11_27';
+    param.cfgfile = 'setup_EAWAG_Zug_2025_11_27_updated';
 
+    param.atm_press_method='offset'; % Options: 'cond' (only for upward),'FP07' (only for upward),'offset','min'
     param.instrument='VMP';
     param.info.prof_dir = 'down';
     param.config.T1=true;
@@ -342,6 +346,33 @@ elseif strcmp(date,'20251127')
     param.config.S2=false;
     param.config.uC1=false;
     param.config.uC2=false;
+
+    % Increase size:
+    param.info.dpD = 5; % Bin size [m]
+    param.info.dp = 2.5; % 50% bin overlap [m]
+%**************************************************************************
+elseif strcmp(date,'20251128') 
+    param.folder = [general_data_folder,'20251128\Level0\'];
+    param.filename_list={'VMP002','VMP003','VMP004','VMP005','VMP006','VMP007','VMP008'}; % Several files can be listed here
+    param.logbook='Logbook_Zug_20251128'; % csv file
+
+    % Set P offset: -0.11dbar, included in updated cfg file 
+    % Use shear sensitivities specified in config file: 
+    param.cfgfile = 'setup_EAWAG_Zug_2025_11_28_updated';
+
+    param.atm_press_method='offset'; % Options: 'cond' (only for upward),'FP07' (only for upward),'offset','min'
+    param.instrument='VMP';
+    param.info.prof_dir = 'down';
+    param.config.T1=true;
+    param.config.T2=true;
+    param.config.S1=true;
+    param.config.S2=false;
+    param.config.uC1=false;
+    param.config.uC2=false;
+
+    % Increase size:
+    % param.info.dpD = 5; % Bin size [m]
+    % param.info.dp = 2.5; % 50% bin overlap [m]
 %**************************************************************************
 elseif strcmp(date,'20260113') 
     param.folder = [general_data_folder,'20260113\Level0\'];

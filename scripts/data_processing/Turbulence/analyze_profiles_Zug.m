@@ -18,7 +18,7 @@ general_data_folder='..\..\..\data\VMP\'; % Where fieldwork data is stored
 % Use turbulence-methods repo:
 odas_folder='C:\Users\tdoda\OneDrive - Université de Lausanne\Projects-GSE42572\1-Turbulence_TALEX\turbulence_methods\scripts\odas_v4.4\'; % Where ODAS functions are stored
 functions_folder="C:\Users\tdoda\OneDrive - Université de Lausanne\Projects-GSE42572\1-Turbulence_TALEX\turbulence_methods\scripts\microstructure\"; % Where microstructure functions are stored
-date_campaign="20251126"; % Should match the date in "load_parameters" function except if "default" is used
+date_campaign="20251128"; % Should match the date in "load_parameters" function except if "default" is used
 
 turbulence_analysis=true; % If =true, run the full turbulence analysis, if =false just check the profiles
 modify_cfg=true; % Modify the configuration file (if "false", configuration from .P file is used)
@@ -46,7 +46,7 @@ addpath(functions_folder) % Add microstructure functions
 %% Load metadata
 param=load_parameters_Zug_Tomy(lakename,date_campaign,general_data_folder);
 %param=load_parameters_Geneva(lakename,date_campaign,general_data_folder);
-param.filename_list={'VMP005'};
+%param.filename_list={'VMP004','VMP005','VMP009'};
 
 if modify_cfg 
     if (~isfield(param,'cfgfile') || strcmp(param.cfgfile,''))
