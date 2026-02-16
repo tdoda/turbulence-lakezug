@@ -80,12 +80,12 @@ Python 3 is required to run some of the scripts. Three types of installation are
 
 ## Working with the project online without any installation (Renku)
 
-To run **Python** scripts on the browser (without any installation), you can use the Renku
+To run **Python** scripts and **Jupyter Notebooks** on the browser (without any installation), you can use the Renku
 platform. Note that this approach **does not** work for Matlab scripts, that can only be ran [locally](#installation-on-a-local-repository) with Matlab installed.
 
 Two options with Renku:
-- Directly run the created session by clicking here: [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/p/tomy.doda/turbulence-lakezug/sessions/01KH6HD8JH0JS73PQVR08HA93E/start)
-- Access the Renku project [here](https://renkulab.io/p/tomy.doda/turbulence-lakezug) and start a new session in the `Sessions` tab. This will start an interactive environment right in your browser.
+- Directly launch the created session by clicking here: [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/p/tomy.doda/turbulence-lakezug/sessions/01KHBHMKZX1PCQAWQNA3S3GSHN/start)
+- Access the Renku project [here](https://renkulab.io/p/tomy.doda/turbulence-lakezug) and create a new session in the `Sessions` tab. This will start an interactive environment right in your browser.
 
 ## Usage 
 
