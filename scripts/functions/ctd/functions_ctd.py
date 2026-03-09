@@ -63,7 +63,8 @@ def read_sea_and_sun(file_path):
             columns[i] = column_conversion[df.columns[i]]
     df.columns = columns
     df["time"] = parse_time(df)
-    df["time"] = df["time"].dt.tz_localize('UTC').astype('int64') // 10 ** 9
+    #df["time"] = df["time"].dt.tz_localize('UTC').astype('int64') // 10 ** 9
+    df["time"] = df["time"].dt.tz_localize('UTC').astype('int64') / 10 ** 9 # Do not round to seconds, otherwise step patterns in time data
     downcast, upcast, air_pressure = extract_single_profile(df)
     profiles = casts_to_profiles(df, downcast, upcast, file_path, "Sea&Sun", air_pressure)
     if len(profiles) == 0:
@@ -388,6 +389,19 @@ def salinity(Temp, Cond, y_cond, temperature_func= default_salinity_temperature)
     salin = y_cond * cond20
     return salin
 
+def salinity_Zug(temperature, conductivity): # From Dave
+    # Conductivty must be in mS/cm
+    ft_comp=-0.0000066*(temperature**3)+0.00080953*(temperature**2)-0.04690669*(temperature)+1.66707237
+    cond20=conductivity/ft_comp # mS/cm
+    salin=0.00000010021*(cond20*1000)**2+0.00089268*(cond20*1000)-0.0024085 # g/kg
+    return cond20,salin
+
+def density_Zug(temperature, conductivity,beta_S=0.000785423994835423):
+    _,salin=salinity_Zug(temperature, conductivity)
+    rho=density(temperature,0)*(1+beta_S*salin)
+
+    return rho
+
 def density(temperature, salinity):
     rho = 1e3 * (
                 0.9998395 + 6.7914e-5 * temperature - 9.0894e-6 * temperature ** 2 + 1.0171e-7 * temperature ** 3 -
@@ -510,7 +524,7 @@ def thorpe_scale(depth,q,stability_type,res=0):
     ndata = depth.size
 
     # Thorpe displacements
-    # = defined here as the distance from current depth where the sorted value is located (i.e., depth where value should be moved to the current depth to get a sort profile is current depth + thorpe displacement)
+    # = defined here as the distance from current depth where the sorted value is located (i.e., depth where value should be moved to the current depth to get a sorted profile is current depth + thorpe displacement)
     # e.g., if displacement=-2, we need to get the value 2 m above the current depth to sort the profile
     # Thorpe displacements can also be defined as depth-depth[idx_sorted] (opposite signs)
     thorpe_disp = depth[idx_sorted] - depth

@@ -10,9 +10,11 @@ from ctd import CTD
 from functions_ctd import create_file_list, copy_files, read_data, process_profiles
 logger = logging.getLogger(__name__)
 
+os.chdir(os.path.dirname(os.path.abspath(__file__))) # Set the current working directory to be the one where the script is saved
+
 #%% Specify field campaign here:
 
-date_campaign='20251128'
+date_campaign='20260113'
 
 #%% Other parameters
 
@@ -24,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 ])
 extensions = [".rsk", ".tob", ".cnv", ".meta"]
 
-for output_folder in ["Level1", "Failed"]:
+for output_folder in ["Level1", "Failed","Level2A"]:
     if os.path.exists(os.path.join(input_folder, output_folder)):
         print("Folder {} already exists: delete it".format(output_folder))
         shutil.rmtree(os.path.join(input_folder, output_folder))
@@ -56,8 +58,8 @@ for file in files:
                 file_name = os.path.basename(file["path"]).rsplit('.', 1)[0]
                 ctd.export(os.path.join(input_folder, "Level1"), "L1_CTD_{}_{}".format(file["type"], file_name),overwrite=True)
                 ctd.mask_data() # Replace flagged data by nan 
-                ctd.derive_variables() # Compute additional variables to add to Level 2
-                ctd.export(os.path.join(input_folder, "Level2"), "L2_CTD_{}_{}".format(file["type"], file_name), overwrite=True) # Create Level 2 file      
+                ctd.derive_variables(lakename='Zug') # Compute additional variables to add to Level 2
+                ctd.export(os.path.join(input_folder, "Level2A"), "L2A_CTD_{}_{}".format(file["type"], file_name), overwrite=True) # Create Level 2 file      
                 
         else:
             logger.info("No metadata for profile {}".format(profile["name"]))

@@ -297,7 +297,7 @@ class CTD:
                 idx = self.data[var + "_qual"][:] > 0
                 self.data[var][idx] = np.nan
 
-    def derive_variables(self, y_cond=0.874e-3, beta=0.807e-3):
+    def derive_variables(self, lakename='',y_cond=0.874e-3, beta=0.807e-3):
         if self.altitude == False or self.latitude == False:
             raise ValueError("Altitude and latitude must be provided in metadata to calculate additional parameters")
         data = deepcopy(self.data)
@@ -305,7 +305,6 @@ class CTD:
             if "_qual" not in var:
                 idx = data[var + "_qual"] > 0
                 data[var][idx] = np.nan
-        breakpoint()
         data["adj_press"] = data["Press"] - self.air_pressure # Atmospheric pressure is computed from measurements in the air in function extract_single_profile
         threshold = data["Temp"].shape[0] * 0.9
         if sum(np.isnan(data["Temp"])) > threshold or sum(np.isnan(data["Cond"])) > threshold or \
@@ -314,9 +313,13 @@ class CTD:
         else:
             self.variables.update(self.derived_variables)
 
-        self.data["SALIN"] = func.salinity(data["Temp"], data["Cond"], y_cond, temperature_func=func.default_salinity_temperature)
         self.data["rho"] = np.asarray([1000] * len(data["Press"]))
-        self.data["rho"] = func.density(data["Temp"], self.data["SALIN"])
+        if lakename=='Zug':
+            _,self.data["SALIN"] = func.salinity_Zug(data["Temp"], data["Cond"])
+            self.data["rho"] = func.density_Zug(data["Temp"], self.data["SALIN"])
+        else:
+            self.data["SALIN"] = func.salinity(data["Temp"], data["Cond"], y_cond, temperature_func=func.default_salinity_temperature)
+            self.data["rho"] = func.density(data["Temp"], self.data["SALIN"])
         self.data["depth"] = 1e4 * data["adj_press"] / self.data["rho"] / sw.g(self.latitude)
 
         try:

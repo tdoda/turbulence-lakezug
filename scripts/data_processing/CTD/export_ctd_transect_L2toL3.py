@@ -1,57 +1,115 @@
-# Computes Thorpe scale from CTD profiles (note that Thorpe scale is already computed in ctd but with potential temperature)
-# and interpolate the transect data to grid
+# Computes additional parameters such as Thorpe scale from CTD profiles (note that Thorpe scale is already computed in ctd but with potential temperature)
+# and export the data to Level2B + interpolate the transect data to grid and export it to Level3
 
 # -*- coding: utf-8 -*-
 import os
 import sys
+import shutil
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\functions\ctd'))
 from functions_ctd import thorpe_scale
 sys.path.append(os.path.join(os.path.dirname(__file__), r'..\..\functions\general_functions'))
-from general_functions import export_netCDF, dist_transect
+from general_functions import export_netCDF, dist_transect, read_netCDF_xr
 import netCDF4
 import numpy as np
 import xarray as xr
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
+
+os.chdir(os.path.dirname(os.path.abspath(__file__))) # Set the current working directory to be the one where the script is saved
 
 #%% Specify field campaign here:
 plt.close('all')
 date_campaign='20260113' # date of the campaign (format YYYYMMDD)
-ctd_data_folder=os.path.join('../../../data/CTD',date_campaign)
-data_folder=os.path.join(ctd_data_folder,'Level2')
+ctd_data_folder=os.path.join('..','..','..','data','CTD',date_campaign)
+data_folder=os.path.join(ctd_data_folder,'Level2A')
+#output_folderL2B=os.path.join(ctd_data_folder,'Level2B')
+# If permission error, use other folder:
+output_folderL2B=os.path.join(r'C:\Users\tdoda\Big_datasets_lakes','Level2B')
+output_folderL3=os.path.join(ctd_data_folder,'Level3')
 filenames=os.listdir(data_folder)
 
 cut_top=0.8 # distance to remove from upper part of the profiles [m]
 dz_grid=0.01 # [m]
 
+#%% Create Level2B and Level3 folder
+
+if os.path.exists(output_folderL2B):
+        print("Level2B folder already exists: delete it")
+        shutil.rmtree(output_folderL2B)
+os.makedirs(os.path.join(output_folderL2B))
+
+if os.path.exists(output_folderL3):
+        print("Level3 folder already exists: delete it")
+        shutil.rmtree(output_folderL3)
+os.makedirs(os.path.join(output_folderL3))
+
+
 #%% Import the CTD data
 CTD_dict=[None]*len(filenames)
 Thorpe_temp_dict=[None]*len(filenames)
+Thorpe_DO_dict=[None]*len(filenames)
 profnames=[None]*len(filenames)
 xcoord=[None]*len(filenames)
 ycoord=[None]*len(filenames)
 disttrans=[None]*len(filenames)
 for k,file in enumerate(filenames):
-    nc=netCDF4.Dataset(os.path.join(data_folder,file))
-    profnames[k]=getattr(nc,"Profile name")
-    depthval=nc.variables["depth"][:].data[nc.variables["depth"][:]>cut_top]
+    #nc=netCDF4.Dataset(os.path.join(data_folder,file))
+    #profnames[k]=getattr(nc,"Profile name")
+    # depthval=nc.variables["depth"][:].data[nc.variables["depth"][:]>cut_top]
+    # indsort=np.argsort(depthval)
+    # xcoord[k]=float(getattr(nc,"X Coordinate (CH1903)"))
+    # ycoord[k]=float(getattr(nc,"Y Coordinate (CH1903)"))
+    # disttrans[k]=round(dist_transect(xcoord[k],ycoord[k],xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',method='projected'))
+    # CTD_dict[k]={"timeall":nc.variables["time"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "depth":depthval[indsort],
+    #                      "temp":nc.variables["Temp"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "cond":nc.variables["Cond"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "rho":nc.variables["rho"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "DO":nc.variables["DO_mg"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "DOsat":nc.variables["sat"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "turb":nc.variables["Turb"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    #                      "chl":nc.variables["Chl_A"][:].data[nc.variables["depth"][:]>cut_top][indsort]}
+
+    dataL2=read_netCDF_xr(os.path.join(data_folder,file))
+    profnames[k]=dataL2.attrs["Profile name"]
+    ind_depth=np.where(dataL2["depth"].data>cut_top)[0]
+    depthval=dataL2["depth"].data[ind_depth]
     indsort=np.argsort(depthval)
-    xcoord[k]=float(getattr(nc,"X Coordinate (CH1903)"))
-    ycoord[k]=float(getattr(nc,"Y Coordinate (CH1903)"))
+    dataL2B = dataL2.isel(time=ind_depth[indsort])
+    xcoord[k]=float(dataL2.attrs["X Coordinate (CH1903)"])
+    ycoord[k]=float(dataL2.attrs["Y Coordinate (CH1903)"])
     disttrans[k]=round(dist_transect(xcoord[k],ycoord[k],xtrans=np.nan,ytrans=np.nan,monotonic_dir='y',method='projected'))
-    CTD_dict[k]={"timeall":nc.variables["time"][:].data[nc.variables["depth"][:]>cut_top][indsort],
+    CTD_dict[k]={"timeall":dataL2["time"].data[ind_depth][indsort],
                          "depth":depthval[indsort],
-                         "temp":nc.variables["Temp"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "cond":nc.variables["Cond"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "rho":nc.variables["rho"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "DO":nc.variables["DO_mg"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "DOsat":nc.variables["sat"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "turb":nc.variables["Turb"][:].data[nc.variables["depth"][:]>cut_top][indsort],
-                         "chl":nc.variables["Chl_A"][:].data[nc.variables["depth"][:]>cut_top][indsort]}
+                         "temp":dataL2["Temp"].data[ind_depth][indsort],
+                         "cond":dataL2["Cond"].data[ind_depth][indsort],
+                         "rho":dataL2["rho"].data[ind_depth][indsort],
+                         "DO":dataL2["DO_mg"].data[ind_depth][indsort],
+                         "DOsat":dataL2["sat"].data[ind_depth][indsort],
+                         "turb":dataL2["Turb"].data[ind_depth][indsort],
+                         "chl":dataL2["Chl_A"].data[ind_depth][indsort]}
+
+
     
     Lt, thorpe_disp, temp_sorted, _, idx_overturns, idx_sorted=thorpe_scale(CTD_dict[k]["depth"],CTD_dict[k]["temp"],"decreasing")
+    Lt_DO, DO_disp, DO_sorted, _, idx_overturns_DO, idx_sorted_DO=thorpe_scale(CTD_dict[k]["depth"],CTD_dict[k]["DO"],"decreasing")
+    
     Thorpe_temp_dict[k]={"temp_sorted":temp_sorted,"idx_overturns":idx_overturns,"thorpe_disp":thorpe_disp,"Lt":Lt}
-    nc.close()
+    Thorpe_DO_dict[k]={"DO_sorted":DO_sorted,"idx_overturns_DO":idx_overturns_DO,"DO_disp":DO_disp,"Lt_DO":Lt_DO}
+    
+    # Add variables to L2B object:
+    dataL2B['Lt'] = xr.DataArray(Lt,dims=['time'],attrs={'unit': "m", 'longname': "Thorpe length scale"})
+    dataL2B['thorpe_disp'] = xr.DataArray(thorpe_disp,dims=['time'],attrs={'unit': "m", 'longname': "Thorpe displacements"})
+    dataL2B['temp_sorted'] = xr.DataArray(temp_sorted,dims=['time'],attrs={'unit': "degC", 'longname': "sorted water temperature"})
+    dataL2B['Lt_DO'] = xr.DataArray(Lt_DO,dims=['time'],attrs={'unit': "m", 'longname': "Thorpe length scale for oxygen"})
+    dataL2B['DO_disp'] = xr.DataArray(DO_disp,dims=['time'],attrs={'unit': "m", 'longname': "Thorpe displacements for oxygen"})
+    dataL2B['DO_sorted'] = xr.DataArray(DO_sorted,dims=['time'],attrs={'unit': "mg/l", 'longname': "sorted dissolved oxygen concentration"})
+
+    dataL2B.to_netcdf(os.path.join(output_folderL2B,"L2B_{}".format(file[file.find('L2A_')+4:])))
+    #dataL2B.to_netcdf(os.path.join(output_folderL2B,"L2B_{}".format(file[file.find('L2A_')+4:])), engine="h5netcdf")
+    
+    #nc.close()
     
 
 #%% Grid interpolation
@@ -59,7 +117,8 @@ for k,file in enumerate(filenames):
 depthgrid=np.array([np.arange(0,200,dz_grid),]).transpose()
 CTDdata={"time":np.full(len(CTD_dict),np.nan),
          "depth":depthgrid}
-varnames=["temp","cond","rho","DO","DOsat","turb","chl","temp_sorted","thorpe_disp","Lt","overturn_bool"]
+varnames=["temp","cond","rho","DO","DOsat","turb","chl","temp_sorted","thorpe_disp","Lt","overturn_bool",
+          "DO_sorted","DO_disp","Lt_DO"]
 for var in varnames:
     CTDdata[var]=np.full((len(depthgrid),len(CTD_dict)),np.nan)
 CTDdata["xcoord"]=np.full(len(CTD_dict),np.nan)
@@ -73,7 +132,8 @@ for k in range(len(CTD_dict)):
             CTDdata[var][:,k]=np.interp(CTDdata["depth"][:,0],CTD_dict[k]["depth"],CTD_dict[k][var],left=np.nan, right=np.nan)
         if var in Thorpe_temp_dict[k].keys():
             CTDdata[var][:,k]=np.interp(CTDdata["depth"][:,0],CTD_dict[k]["depth"],Thorpe_temp_dict[k][var],left=np.nan, right=np.nan)
-    
+        if var in Thorpe_DO_dict[k].keys():
+            CTDdata[var][:,k]=np.interp(CTDdata["depth"][:,0],CTD_dict[k]["depth"],Thorpe_DO_dict[k][var],left=np.nan, right=np.nan)  
     overturn_bool=np.zeros((len(depthgrid),))
     for ko in range(len(Thorpe_temp_dict[k]["idx_overturns"])):
         ind_start=np.where(depthgrid>=CTD_dict[k]["depth"][Thorpe_temp_dict[k]["idx_overturns"][ko][0]])[0][0]                          
@@ -175,6 +235,9 @@ CTD_variables={"time": {"var_name": "time", "dim": ("time"),'unit': "seconds sin
                "turb":{"var_name": "turb", "dim": ("depth","time"),'unit': "FTU", 'longname': "water turbidity"},
                "temp_sorted":{"var_name": "temp_sorted", "dim": ("depth","time"),'unit': "degC", 'longname': "sorted water temperature"},
                "thorpe_disp":{"var_name": "thorpe_disp", "dim": ("depth","time"),'unit': "m", 'longname': "Thorpe displacements"},
+               "Lt_DO":{"var_name": "Lt_DO", "dim": ("depth","time"),'unit': "m", 'longname': "Thorpe length scale for oxygen"},
+               "DO_sorted":{"var_name": "DO_sorted", "dim": ("depth","time"),'unit': "mg/l", 'longname': "sorted dissolved oxygen concentration"},
+               "DO_disp":{"var_name": "DO_disp", "dim": ("depth","time"),'unit': "m", 'longname': "Thorpe displacements for oxygen"},
                "Lt":{"var_name": "Lt", "dim": ("depth","time"),'unit': "m", 'longname': "Thorpe length scale"},
                "overturn_bool":{"var_name": "overturn_bool", "dim": ("depth","time"),'unit': "-", 'longname': "Presence (1) or absence (0) of an overturn"},
                "xcoord":{"var_name": "xcoord", "dim": ("time"),'unit': "m", 'longname': "X coordinates (CH1903)"},
@@ -182,5 +245,5 @@ CTD_variables={"time": {"var_name": "time", "dim": ("time"),'unit': "seconds sin
                "disttrans":{"var_name": "disttrans", "dim": ("time"),'unit': "m", 'longname': "Distance along the transect"},
                "profnames":{"var_name": "profnames", "dim": ("time"),'unit': "-", 'longname': "Profile name","var_type": "str"}}
 
-export_netCDF(os.path.join(ctd_data_folder,"Level3","CTD_transect2_{}.nc".format(date_campaign)),CTD_attributes,CTD_dimensions,CTD_variables,CTDdata)
+export_netCDF(os.path.join(output_folderL3,"CTD_transect_{}.nc".format(date_campaign)),CTD_attributes,CTD_dimensions,CTD_variables,CTDdata)
 
