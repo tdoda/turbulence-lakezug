@@ -97,7 +97,8 @@ def compute_logmedian_dict(DATA,cell_size,varname,ind_file=np.nan,fieldname="BIN
         data_cell=var_allprof[(depth_allprof>=depth_start[k])&(depth_allprof<depth_end[k])]
         data_cell[data_cell<=0]=np.nan # Remove non positive values for log calculation
         if len(data_cell[~np.isnan(data_cell)])>0:
-            logmed_cells[indcell:indcell+2]=np.nanmedian(np.log10(data_cell)) 
+            logmed_cells[indcell:indcell+2]=np.nanmedian(np.log10(data_cell))
+             
 
     return depth_allprof,var_allprof,depth_cells,logmed_cells
 
@@ -135,6 +136,8 @@ def compute_logmedian_list(depth_list,var_list,cell_size):
     depth_end=np.arange(cell_size,np.nanmax(depth_allprof),cell_size)
     depth_cells=np.sort(np.concatenate((depth_start,depth_end))) 
     logmed_cells=np.full(depth_cells.shape,np.nan) 
+    logq25_cells=np.full(depth_cells.shape,np.nan) 
+    logq75_cells=np.full(depth_cells.shape,np.nan) 
 
     for k in range(len(depth_start)):
         indcell=np.where(depth_cells==depth_start[k])[0][-1]
@@ -142,6 +145,8 @@ def compute_logmedian_list(depth_list,var_list,cell_size):
         data_cell[data_cell<=0]=np.nan # Remove non positive values for log calculation
         if len(data_cell[~np.isnan(data_cell)])>0:
             logmed_cells[indcell:indcell+2]=np.nanmedian(np.log10(data_cell)) 
+            logq25_cells[indcell:indcell+2]=np.nanpercentile(np.log10(data_cell), 25)
+            logq75_cells[indcell:indcell+2]=np.nanpercentile(np.log10(data_cell), 75)
 
-    return depth_allprof,var_allprof,depth_cells,logmed_cells
+    return depth_allprof,var_allprof,depth_cells,logmed_cells,logq25_cells,logq75_cells
 
